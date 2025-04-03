@@ -1,0 +1,33 @@
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
+const db = require("./config/database.js");
+
+const UserRoutes = require("./routes/userRoutes.js")
+
+
+const app = express()
+
+db.authenticate()
+  .then(() => console.log("database connected"))
+  .catch((err) => console.log("Error connecting to the database", err));
+
+app.use(cookieParser());
+
+app.use(cors({
+    origin: ['http://localhost:3000','http://127.0.0.1:3000'],
+    credentials: true,
+    methods: ['GET','POST','DELETE','PUT','OPTIONS']
+}));
+
+app.use(express.json());
+
+app.use("/api/auth", UserRoutes);
+
+const port = 3000;
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+    
+})
