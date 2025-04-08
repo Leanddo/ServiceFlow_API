@@ -1,6 +1,5 @@
 const { User } = require("../models/Users");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 const { httpCode } = require("../utils/httpCodeHandler");
 const { generateToken } = require("../utils/jwtUtils");
@@ -8,9 +7,12 @@ const { generateToken } = require("../utils/jwtUtils");
 require("dotenv").config();
 
 exports.signUp = async (req, res) => {
-  const { username, email, password, phone, role } = req.body;
+  const { username, email, password, role } = req.body;
   try {
     const existingUser = await User.findOne({ where: { email } });
+    if (!username || !email || !password) {
+    }
+
     if (existingUser) {
       return httpCode(400, { error: "This email is already taken " }, res);
     }
@@ -28,7 +30,6 @@ exports.signUp = async (req, res) => {
     const createdUser = await User.create({
       username,
       email,
-      phone,
       role,
       password: hashedpassword,
     });
@@ -64,7 +65,7 @@ exports.login = async (req, res) => {
       httpCode(400, { error: "incorrect username or email" }, res);
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (isPasswordValid) {
       const token = await generateToken(user.user_id);

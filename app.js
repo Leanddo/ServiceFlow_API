@@ -1,33 +1,35 @@
 const express = require("express");
 const cors = require("cors");
+const passport = require("passport"); 
 const cookieParser = require("cookie-parser");
+require("./config/passportConfig");
 
 const db = require("./config/database.js");
 
-const UserRoutes = require("./routes/userRoutes.js")
+const UserRoutes = require("./routes/userRoutes.js");
+const googleRoutes = require("./routes/googleRoutes.js");
 
-
-const app = express()
+const app = express();
 
 db.authenticate()
   .then(() => console.log("database connected"))
   .catch((err) => console.log("Error connecting to the database", err));
 
 app.use(cookieParser());
-
-app.use(cors({
-    origin: ['http://localhost:3000','http://127.0.0.1:3000'],
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
     credentials: true,
-    methods: ['GET','POST','DELETE','PUT','OPTIONS']
-}));
-
+    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
+  })
+);
 app.use(express.json());
+app.use(passport.initialize());
 
-app.use("/api/auth", UserRoutes);
+app.use("/api/auth", [UserRoutes,googleRoutes]);
 
 const port = 3000;
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-    
-})
+  console.log(`Server is running on http://localhost:${port}`);
+});

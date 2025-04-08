@@ -18,18 +18,17 @@ const User = db.define("Users", {
   },
   password: {
     type: Sequelize.STRING,
-    allowNull: false,
   },
   fotoUrl: {
     type: Sequelize.STRING,
   },
   role: {
     type: Sequelize.STRING,
-    allowNull: false,
+    defaultValue: "user",
   },
-  phone: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
+  google_Id: {
+    type: Sequelize.STRING,
+    unique: true,
   },
   created_at: {
     type: Sequelize.DATE,
@@ -37,6 +36,5 @@ const User = db.define("Users", {
     defaultValue: Sequelize.NOW,
   },
 });
-
 
 module.exports = { User };

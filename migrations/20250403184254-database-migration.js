@@ -20,18 +20,17 @@ module.exports = {
       },
       password: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
       fotoUrl: {
         type: Sequelize.STRING,
       },
       role: {
         type: Sequelize.STRING,
-        allowNull: false,
+        defaultValue: "user",
       },
-      phone: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
+      google_ID: {
+        type: Sequelize.STRING,
+        unique: true,
       },
       created_at: {
         type: Sequelize.DATE,
@@ -243,6 +242,23 @@ module.exports = {
         },
       },
     });
+
+    await queryInterface.createTable("OTP", {
+      OTP_Id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      OTPCode: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+    });
+
   },
   async down(queryInterface, Sequelize) {},
 };
