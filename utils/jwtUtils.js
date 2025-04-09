@@ -17,3 +17,12 @@ exports.generateToken = (userId) => {
   });
 };
 
+exports.verifyToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWTSECRET);
+    return decoded; 
+  } catch (error) {
+    console.error("Erro ao verificar o token JWT:", error);
+    return null;
+  }
+};

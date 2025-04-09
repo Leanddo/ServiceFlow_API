@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const db = require("../config/database");
+const {User} = require("./Users"); // importa o modelo User
 
 const OTP = db.define("OTP", {
   OTP_Id: {
@@ -8,12 +9,25 @@ const OTP = db.define("OTP", {
     autoIncrement: true,
   },
   OTPCode: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
     allowNull: false,
   },
-  email: {
-    type: Sequelize.STRING,
+  user_id: {
+    type: Sequelize.INTEGER,
+    references: {
+      model: "Users",
+      key: "user_id",
+    },
   },
+  otpExpires: {
+    type: Sequelize.DATE,
+    allowNull: false,
+  },
+});
+
+OTP.belongsTo(User, {
+  foreignKey: "user_id",
+  onDelete: "CASCADE",
 });
 
 module.exports = { OTP };

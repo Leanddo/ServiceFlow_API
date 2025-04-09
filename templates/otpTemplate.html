@@ -1,0 +1,51 @@
+<!-- templates/otpTemplate.html -->
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+      }
+      .header {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+      }
+      .code {
+        font-size: 32px;
+        font-weight: bold;
+        color: blue;
+        margin: 20px 0;
+      }
+      .message {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+      .footer {
+        font-size: 12px;
+        color: #999;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Código de Dois Fatores</div>
+      <p class="message">Use o código abaixo para concluir seu processo de login. O código é válido por 2 minutos.</p>
+      <div class="code">{{CODE}}</div>
+      <p class="footer">Se você não solicitou este código, por favor, ignore este e-mail.</p>
+    </div>
+  </body>
+</html>

@@ -15,14 +15,26 @@ passport.use(
       try {
         let user = await User.findOne({ where: { google_Id: profile.id } });
 
+
         if (!user) {
           user = await User.create({
             username: profile.displayName,
             email: profile.emails[0].value,
             google_Id: profile.id,
             fotoUrl: profile.photos[0].value,
+            is_verified: profile.emails[0].verified,
           });
         }
+
+        await User.update(
+          { username: profile.displayName, },
+          {
+            where: {
+              google_Id: profile.id,
+            },
+          }
+        ); 
+      
 
         const token = await generateToken(user.user_id);
         return done(null, { user, token });

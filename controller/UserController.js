@@ -1,20 +1,25 @@
 const { User } = require("../models/Users");
+const { OTP } = require("../models/OTP");
+
 const bcrypt = require("bcrypt");
 
 const { httpCode } = require("../utils/httpCodeHandler");
 const { generateToken } = require("../utils/jwtUtils");
+const  sendEmail  = require("../utils/emailSender");
 
 require("dotenv").config();
 
 exports.signUp = async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { username, email, password } = req.body;
   try {
+    // Verificar se o usuário já existe
     const existingUser = await User.findOne({ where: { email } });
     if (!username || !email || !password) {
+      return httpCode(401, { error: "All fields are required" }, res);
     }
 
     if (existingUser) {
-      return httpCode(400, { error: "This email is already taken " }, res);
+      return httpCode(400, { error: "This email is already taken" }, res);
     }
 
     if (password.length < 6) {
@@ -25,29 +30,45 @@ exports.signUp = async (req, res) => {
       );
     }
 
-    const hashedpassword = bcrypt.hashSync(password, 10);
+    // Criptografar a senha
+    const hashedPassword = bcrypt.hashSync(password, 10);
 
+    // Criar o usuário no banco de dados
     const createdUser = await User.create({
       username,
       email,
-      role,
-      password: hashedpassword,
+      password: hashedPassword,
     });
-    console.log("opa");
 
+    // Gerar o OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // OTP válido por 10 minutos
+
+    // Salvar o OTP no banco de dados
+    await OTP.create({
+      OTPCode: otp,
+      user_id: createdUser.user_id,
+      otpExpires: expiresAt,
+    });
+
+    // Enviar o OTP por email
+    await sendEmail(email, otp);
+
+    // Gerar o token para autenticação
     const token = await generateToken(createdUser.user_id);
 
+    // Enviar o cookie com o token
     res.cookie("authcookie", token, {
-      maxAge: 900000,
       httpOnly: true,
       secure: true,
       sameSite: "None",
     });
 
-    httpCode(201, createdUser, res);
+    // Retornar o usuário criado
+    return httpCode(201, createdUser, res);
   } catch (error) {
     console.log(error);
-    httpCode(500, { error: "Internal server error" }, res);
+    return httpCode(500, { error: "Internal server error" }, res);
   }
 };
 
@@ -71,7 +92,6 @@ exports.login = async (req, res) => {
       const token = await generateToken(user.user_id);
 
       res.cookie("authcookie", token, {
-        maxAge: 900000,
         httpOnly: true,
         secure: true,
         sameSite: "None",

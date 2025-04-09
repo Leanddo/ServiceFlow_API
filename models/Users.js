@@ -30,6 +30,10 @@ const User = db.define("Users", {
     type: Sequelize.STRING,
     unique: true,
   },
+  is_verified: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+  },
   created_at: {
     type: Sequelize.DATE,
     allowNull: false,

@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const passport = require("passport"); 
+const passport = require("passport");
 const cookieParser = require("cookie-parser");
 require("./config/passportConfig");
 
@@ -8,6 +8,7 @@ const db = require("./config/database.js");
 
 const UserRoutes = require("./routes/userRoutes.js");
 const googleRoutes = require("./routes/googleRoutes.js");
+const OTPRoutes = require("./routes/OTPRoute.js");
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use(
 app.use(express.json());
 app.use(passport.initialize());
 
-app.use("/api/auth", [UserRoutes,googleRoutes]);
+app.use("/api/auth", [UserRoutes, googleRoutes, OTPRoutes]);
 
 const port = 3000;
 

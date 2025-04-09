@@ -32,6 +32,10 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true,
       },
+      is_verified: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -250,15 +254,30 @@ module.exports = {
         autoIncrement: true,
       },
       OTPCode: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      email: {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      user_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Users",
+          key: "user_id",
+        },
+      },
+      otpExpires: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
     });
-
   },
-  async down(queryInterface, Sequelize) {},
+  async down(queryInterface, Sequelize) {
+   /*  await queryInterface.dropTable("Users");
+    await queryInterface.dropTable("Businesses");
+    await queryInterface.dropTable("Services");
+    await queryInterface.dropTable("Professionals");
+    await queryInterface.dropTable("Reviews");
+    await queryInterface.dropTable("Notifications");
+    await queryInterface.dropTable("Queues"); 
+    await queryInterface.dropTable("OTP");*/
+  },
 };
