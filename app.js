@@ -28,6 +28,8 @@ app.use(
 app.use(express.json());
 app.use(passport.initialize());
 
+app.use("/userImg", express.static("public/userImg"));
+
 app.use("/api", [authRoutes, googleRoutes, OTPRoutes, profileRouter]);
 
 const port = 3000;
