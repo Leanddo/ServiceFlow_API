@@ -1,5 +1,4 @@
-const { User } = require("../../models/Users");
-const { OTP } = require("../../models/OTP");
+const { User,OTP } = require("../../models/index");
 
 const bcrypt = require("bcrypt");
 

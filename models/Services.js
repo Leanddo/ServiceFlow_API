@@ -40,20 +40,4 @@ const Services = db.define("Services", {
   },
 });
 
-// Definindo as associações
-Services.belongsTo(models.Business, {
-  foreignKey: "business_id",
-  onDelete: "CASCADE", // Se o negócio for excluído, os serviços associados também serão excluídos
-});
-
-Services.hasMany(models.Review, {
-  foreignKey: "service_id",
-  onDelete: "CASCADE", // Se o serviço for excluído, as avaliações associadas também serão excluídas
-});
-
-Services.hasMany(models.Queue, {
-  foreignKey: "service_id",
-  onDelete: "CASCADE", // Se o serviço for excluído, as filas associadas também serão excluídas
-});
-
 module.exports = { Services };

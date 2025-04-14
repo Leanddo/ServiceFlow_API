@@ -38,15 +38,4 @@ const Professionals = db.define("Professionals", {
   },
 });
 
-// Definindo as associações
-Professionals.belongsTo(models.Business, {
-  foreignKey: "business_id",
-  onDelete: "CASCADE", // Se o negócio for excluído, o profissional também será excluído
-});
-
-Professionals.belongsTo(models.User, {
-  foreignKey: "user_id",
-  onDelete: "CASCADE", // Se o usuário for excluído, o profissional associado também será excluído
-});
-
 module.exports = { Professionals };

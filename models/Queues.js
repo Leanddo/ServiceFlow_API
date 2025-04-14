@@ -38,20 +38,5 @@ const Queues = db.define("Queues", {
   },
 });
 
-// Definindo as associações
-Queues.belongsTo(models.User, {
-  foreignKey: "user_id",
-  onDelete: "CASCADE", // Se o usuário for excluído, a fila também será excluída
-});
-
-Queues.belongsTo(models.Service, {
-  foreignKey: "service_id",
-  onDelete: "CASCADE", // Se o serviço for excluído, a fila também será excluída
-});
-
-Queues.belongsTo(models.Business, {
-  foreignKey: "business_id",
-  onDelete: "CASCADE", // Se o negócio for excluído, a fila também será excluída
-});
 
 module.exports = { Queues };

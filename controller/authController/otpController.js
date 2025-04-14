@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
-const { OTP } = require("../../models/OTP");
-const { User } = require("../../models/Users");
+const { User,OTP } = require("../../models/index");
 const { verifyToken } = require("../../utils/jwtUtils");
 const sendEmail = require("../../utils/emailSender");
 const {httpCode} = require("../../utils/httpCodeHandler")

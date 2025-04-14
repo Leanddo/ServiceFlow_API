@@ -28,9 +28,4 @@ const Notifications = db.define("Notifications", {
   },
 });
 
-Notifications.belongsTo(models.User, {
-  foreignKey: "user_id", // Campo que referencia o usuário
-  onDelete: "CASCADE", // Caso o usuário seja excluído, as notificações também serão excluídas
-});
-
 module.exports = { Notifications };

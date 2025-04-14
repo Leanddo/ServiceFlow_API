@@ -16,7 +16,7 @@ const Businesses = db.define("Businesses", {
     allowNull: false,
   },
   business_phone: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
     allowNull: false,
   },
   business_email: {
@@ -24,9 +24,37 @@ const Businesses = db.define("Businesses", {
     allowNull: false,
   },
   business_type: {
-    type: Sequelize.STRING,
+    type: Sequelize.ENUM(
+      "Barbershop", 
+      "Workshop", 
+      "Clinic", 
+      "Other", 
+      "Restaurant",  
+      "Gym", 
+      "Hairdresser", 
+      "Pet Store", 
+      "Consulting Room", 
+      "Pharmacy", 
+      "Photography Studio", 
+      "Cafeteria", 
+      "Spa", 
+      "School", 
+      "Cleaning Services", 
+      "Transportation", 
+      "Hotel", 
+      "Beauty Salon", 
+      "Laundry", 
+      "Kiosk", 
+      "Event Venue", 
+      "Bar", 
+      "Fast Food Restaurant", 
+      "Car Repair Shop", 
+      "Consultancy", 
+      "Design Services"
+    ),
     allowNull: false,
   },
+  
 });
 
 module.exports = { Businesses };

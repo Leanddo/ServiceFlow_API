@@ -58,15 +58,52 @@ module.exports = {
         allowNull: false,
       },
       business_phone: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false,
       },
       business_email: {
         type: Sequelize.STRING,
         allowNull: false,
+        validate: {
+          isEmail: true,
+        },
+      },
+      main_photo_url: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      description: {
+        type: Sequelize.STRING, 
       },
       business_type: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM(
+          "Barbershop",
+          "Workshop",
+          "Clinic",
+          "Other",
+          "Restaurant",
+          "Gym",
+          "Hairdresser",
+          "Pet Store",
+          "Consulting Room",
+          "Pharmacy",
+          "Photography Studio",
+          "Cafeteria",
+          "Spa",
+          "School",
+          "Cleaning Services",
+          "Transportation",
+          "Hotel",
+          "Beauty Salon",
+          "Laundry",
+          "Kiosk",
+          "Event Venue",
+          "Bar",
+          "Fast Food Restaurant",
+          "Car Repair Shop",
+          "Consultancy",
+          "Design Services"
+        ),
         allowNull: false,
       },
     });
@@ -91,10 +128,6 @@ module.exports = {
       },
       duration: {
         type: Sequelize.DOUBLE,
-        allowNull: false,
-      },
-      category: {
-        type: Sequelize.STRING,
         allowNull: false,
       },
       category: {
@@ -271,13 +304,13 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-   /*  await queryInterface.dropTable("Users");
-    await queryInterface.dropTable("Businesses");
-    await queryInterface.dropTable("Services");
-    await queryInterface.dropTable("Professionals");
-    await queryInterface.dropTable("Reviews");
-    await queryInterface.dropTable("Notifications");
-    await queryInterface.dropTable("Queues"); 
-    await queryInterface.dropTable("OTP");*/
+    await queryInterface.dropTable("OTP"); // depende de Users
+    await queryInterface.dropTable("Queues"); // depende de Users, Businesses, Services
+    await queryInterface.dropTable("Notifications"); // depende de Users
+    await queryInterface.dropTable("Reviews"); // depende de Users, Services
+    await queryInterface.dropTable("Professionals"); // depende de Users, Businesses
+    await queryInterface.dropTable("Services"); // depende de Businesses
+    await queryInterface.dropTable("Businesses"); // depende de nada
+    await queryInterface.dropTable("Users"); // é base para várias
   },
 };
