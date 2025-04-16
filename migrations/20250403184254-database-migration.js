@@ -73,7 +73,7 @@ module.exports = {
         allowNull: true,
       },
       description: {
-        type: Sequelize.STRING, 
+        type: Sequelize.STRING,
       },
       business_type: {
         type: Sequelize.ENUM(
@@ -105,6 +105,36 @@ module.exports = {
           "Design Services"
         ),
         allowNull: false,
+      },
+    });
+
+    await queryInterface.createTable("BusinessPhotos", {
+      photo_id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      business_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Businesses",
+          key: "business_id",
+        },
+        onDelete: "CASCADE",
+      },
+      photo_url: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      created_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
       },
     });
 
@@ -156,13 +186,23 @@ module.exports = {
       professional_fotoUrl: {
         type: Sequelize.STRING,
       },
-      specialty: {
+      professional_fotoUrl: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
       availability: {
+        type: Sequelize.JSON, // ou STRING se você preferir continuar com texto simples
+        allowNull: false,
+        defaultValue: [], // Exemplo: ["Segunda - 09:00 - 17:00", "Terça - 10:00 - 18:00"]
+      },
+      role: {
+        type: Sequelize.ENUM("Owner", "Employee", "Assistant", "Other"),
+        allowNull: false,
+        defaultValue: "Employee",
+      },
+      status: {
         type: Sequelize.STRING,
         allowNull: false,
+        defaultValue: "active",
       },
       business_id: {
         type: Sequelize.INTEGER,
@@ -304,13 +344,13 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("OTP"); // depende de Users
+   /*  await queryInterface.dropTable("OTP"); // depende de Users
     await queryInterface.dropTable("Queues"); // depende de Users, Businesses, Services
     await queryInterface.dropTable("Notifications"); // depende de Users
-    await queryInterface.dropTable("Reviews"); // depende de Users, Services
+    await queryInterface.dropTable("Reviews"); // depende de Users, Services */
     await queryInterface.dropTable("Professionals"); // depende de Users, Businesses
-    await queryInterface.dropTable("Services"); // depende de Businesses
+   /*  await queryInterface.dropTable("Services"); // depende de Businesses
     await queryInterface.dropTable("Businesses"); // depende de nada
-    await queryInterface.dropTable("Users"); // é base para várias
+    await queryInterface.dropTable("Users"); // é base para várias */
   },
 };

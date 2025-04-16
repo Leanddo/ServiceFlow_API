@@ -14,13 +14,20 @@ const Professionals = db.define("Professionals", {
   professional_fotoUrl: {
     type: Sequelize.STRING,
   },
-  specialty: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
   availability: {
+    type: Sequelize.JSON, // ou STRING se você preferir continuar com texto simples
+    allowNull: false,
+    defaultValue: [], // Exemplo: ["Segunda - 09:00 - 17:00", "Terça - 10:00 - 18:00"]
+  },
+  role: {
+    type: Sequelize.ENUM("Owner", "Employee", "Assistant", "Other"),
+    allowNull: false,
+    defaultValue: "Funcionário",
+  },
+  status: {
     type: Sequelize.STRING,
     allowNull: false,
+    defaultValue: "active",
   },
   business_id: {
     type: Sequelize.INTEGER,

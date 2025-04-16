@@ -48,7 +48,7 @@ exports.signUp = async (req, res) => {
 
     await sendEmail(email, otp);
 
-    const token = await generateToken(createdUser.user_id);
+    const token = await generateToken(createdUser);
 
     res.cookie("authcookie", token, {
       httpOnly: true,
@@ -84,7 +84,7 @@ exports.login = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (isPasswordValid) {
-      const token = await generateToken(user.user_id);
+      const token = await generateToken(user);
 
       res.cookie("authcookie", token, {
         httpOnly: true,

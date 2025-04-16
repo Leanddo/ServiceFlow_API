@@ -1,9 +1,11 @@
 const jwt = require("jsonwebtoken");
 
-exports.generateToken = (userId) => {
+exports.generateToken = (user) => {
   return new Promise((resolve, reject) => {
     jwt.sign(
-      { user_id: userId },
+      { user_id: user.user_id,
+        username: user.username
+       },
       process.env.JWTSECRET,
       { expiresIn: "1w" },
       (err, token) => {

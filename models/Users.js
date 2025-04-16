@@ -29,7 +29,7 @@ const User = db.define("Users", {
     type: Sequelize.STRING,
     defaultValue: "user",
   },
-  google_Id: {
+  google_ID: {
     type: Sequelize.STRING,
     unique: true,
   },

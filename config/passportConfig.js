@@ -36,7 +36,7 @@ passport.use(
         ); 
       
 
-        const token = await generateToken(user.user_id);
+        const token = await generateToken(user);
         return done(null, { user, token });
       } catch (error) {
         return done(error, null);

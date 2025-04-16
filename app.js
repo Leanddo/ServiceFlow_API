@@ -9,7 +9,8 @@ const db = require("./config/database.js");
 const authRoutes = require("./routes/auth/authRoutes.js");
 const googleRoutes = require("./routes/auth/googleRoutes.js");
 const OTPRoutes = require("./routes/auth/OTPRoute.js");
-const profileRouter = require("./routes/userRoutes.js")
+const profileRouter = require("./routes/userRoutes.js");
+const businessesRouter = require("./routes/businessRouter.js");
 
 const app = express();
 
@@ -30,7 +31,13 @@ app.use(passport.initialize());
 
 app.use("/userImg", express.static("public/userImg"));
 
-app.use("/api", [authRoutes, googleRoutes, OTPRoutes, profileRouter]);
+app.use("/api", [
+  authRoutes,
+  googleRoutes,
+  OTPRoutes,
+  profileRouter,
+  businessesRouter,
+]);
 
 const port = 3000;
 
