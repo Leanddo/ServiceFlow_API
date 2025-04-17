@@ -9,6 +9,7 @@ exports.createBusiness = async (req, res) => {
     business_phone,
     business_email,
     description,
+    isActive,
   } = req.body;
 
   // Validação de campos obrigatórios
@@ -46,6 +47,7 @@ exports.createBusiness = async (req, res) => {
       business_phone,
       business_email,
       description,
+      isActive,
     });
 
     await Professionals.create({
@@ -84,6 +86,8 @@ exports.getAllBusinesses = async (req, res) => {
       filter.business_type = business_type;
     }
 
+    filter.isActive = true;
+
     const businesses = await Businesses.findAll({
       where: filter,
       include: ["photos"],
@@ -99,7 +103,11 @@ exports.getBusinessById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const business = await Businesses.findByPk(id, {
+    const business = await Businesses.findOne({
+      where: {
+        business_id: id,
+        isActive: true,
+      },
       include: ["photos"],
     });
 
@@ -114,7 +122,7 @@ exports.getBusinessById = async (req, res) => {
 };
 
 exports.updateBusiness = async (req, res) => {
-  const { business_id } = req.params; // ID do negócio que queremos atualizar
+  const { business_id } = req.params;
 
   const {
     business_name,
@@ -122,7 +130,7 @@ exports.updateBusiness = async (req, res) => {
     business_type,
     business_phone,
     business_email,
-    description
+    description,
   } = req.body;
 
   try {
@@ -144,15 +152,13 @@ exports.updateBusiness = async (req, res) => {
         .json({ message: "Não tem permissão para atualizar este negócio." });
     }
 
-
-    // Atualizar o negócio
     const updatedBusiness = await business.update({
       business_name,
       business_address,
       business_phone,
       business_email,
       business_type,
-      description
+      description,
     });
 
     res.status(200).json({
@@ -165,20 +171,82 @@ exports.updateBusiness = async (req, res) => {
   }
 };
 
-exports.deleteBusiness = async (req, res) => {
-  const { businessId } = req.params;
+exports.changeBusinessStatus = async (req, res) => {
+  const { business_id } = req.params;
+  const { isActive } = req.body;
 
   try {
-    const deleted = await Business.destroy({
-      where: { business_id: businessId },
-    });
-
-    if (!deleted) {
-      return res.status(404).json({ message: "Negócio não encontrado" });
+    const business = await Businesses.findByPk(business_id);
+    if (!business) {
+      return res.status(404).json({ message: "Negócio não encontrado." });
     }
 
-    res.status(200).json({ message: "Negócio apagado com sucesso" });
+    const professional = await Professionals.findOne({
+      where: { user_id: req.user.user_id, business_id },
+    });
+
+    if (!professional || professional.role !== "Owner") {
+      return res
+        .status(403)
+        .json({
+          message: "Apenas o proprietário pode alterar o estado do negócio.",
+        });
+    }
+
+    business.isActive = isActive;
+    await business.save();
+
+    res
+      .status(200)
+      .json({ message: "Estado do negócio atualizado com sucesso." });
   } catch (error) {
-    res.status(500).json({ message: "Erro ao apagar negócio", error });
+    res
+      .status(500)
+      .json({ message: "Erro ao alterar o estado do negócio.", error });
   }
 };
+
+exports.updateBusinessPhoto = async (req, res) => {
+  const { business_id } = req.params;
+
+  try {
+    const business = await Businesses.findByPk(business_id);
+
+    if (!business) {
+      return res.status(404).json({ message: "Negócio não encontrado." });
+    }
+
+    // Verifica se tem uma imagem antiga e apaga
+    if (req.file && business.main_photo_url) {
+      const oldImagePath = path.join(
+        __dirname,
+        "..",
+        "public/businessImg",
+        path.basename(business.main_photo_url)
+      );
+
+      fs.unlink(oldImagePath, (err) => {
+        if (err) {
+          console.warn("Erro ao apagar imagem antiga do negócio:", err.message);
+        }
+      });
+    }
+
+    // Atualiza com nova imagem
+    if (req.file) {
+      business.main_photo_url = `/businessImg/${req.file.filename}`;
+      await business.save();
+    }
+
+    return res.status(200).json({
+      message: "Imagem do negócio atualizada com sucesso.",
+      photoUrl: business.main_photo_url,
+    });
+  } catch (err) {
+    console.error("Erro ao atualizar imagem do negócio:", err);
+    return res
+      .status(500)
+      .json({ message: "Erro interno ao atualizar a imagem do negócio." });
+  }
+};
+

@@ -33,7 +33,8 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { username } = req.body;
+    const { username } = req.body || {}; 
+    
     const user = await User.findByPk(req.user.user_id);
 
     if (!user) {
@@ -57,7 +58,11 @@ exports.updateProfile = async (req, res) => {
     }
 
     // Atualiza os campos
-    user.username = username || user.username;
+    if (username) {
+      user.username = username; // Só atualiza se o 'username' foi enviado
+    }
+
+    // Se há foto, atualiza o campo 'fotoUrl'
     if (req.file) {
       user.fotoUrl = `/userImg/${req.file.filename}`;
     }
@@ -71,6 +76,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+
 exports.deleteProfileImage = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.user_id);
@@ -81,7 +87,7 @@ exports.deleteProfileImage = async (req, res) => {
 
     if (!user.fotoUrl) {
       return httpCode(
-        400,
+        400,    
         { message: "Não há imagem de perfil para remover" },
         res
       );

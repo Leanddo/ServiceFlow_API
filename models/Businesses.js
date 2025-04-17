@@ -64,7 +64,10 @@ const Businesses = db.define("Businesses", {
     ),
     allowNull: false,
   },
-  
+  isActive: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: true,
+  },
 });
 
 module.exports = { Businesses };

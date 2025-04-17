@@ -1,9 +1,9 @@
 const multer = require("multer");
 const path = require("path");
 
-const storage = multer.diskStorage({
+const storage = (folder) => multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/userImg/");
+    cb(null, `public/${folder}/`);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -21,19 +21,21 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 2 * 1024 * 1024 }
-});
-
-const handleUpload = (req, res, next) => {
-  upload.single("foto")(req, res, function (err) {
-    if (err) {
-      return res.status(400).json({ message: err.message });
-    }
-    next();
+const createUploadMiddleware = (folder) => {
+  const upload = multer({
+    storage: storage(folder),
+    fileFilter,
+    limits: { fileSize: 2 * 1024 * 1024 } 
   });
+
+  return (req, res, next) => {
+    upload.single("foto")(req, res, function (err) {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+      next();
+    });
+  };
 };
 
-module.exports = handleUpload;
+module.exports = createUploadMiddleware;

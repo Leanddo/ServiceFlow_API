@@ -1,13 +1,13 @@
 const express = require("express");
 
-const upload = require("../middleware/uploadMiddleware");
+const createUploadMiddleware = require("../middleware/uploadMiddleware");
 const {requireAuth} = require("../middleware/authMiddleware");
 const userController = require("../controller/userController");
 
 const Router = express.Router();
 
 Router.get("/user/profile", requireAuth, userController.getProfile);
-Router.put("/user/profile", requireAuth, upload, userController.updateProfile);
+Router.put("/user/profile", requireAuth, createUploadMiddleware("userImg"), userController.updateProfile);
 Router.delete("/user/profile/image", requireAuth, userController.deleteProfileImage);
 
 Router.put("/user/password", requireAuth, userController.updatePassword);

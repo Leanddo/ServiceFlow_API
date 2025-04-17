@@ -106,6 +106,10 @@ module.exports = {
         ),
         allowNull: false,
       },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
     });
 
     await queryInterface.createTable("BusinessPhotos", {
@@ -344,12 +348,13 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-   /*  await queryInterface.dropTable("OTP"); // depende de Users
+    await queryInterface.dropTable("OTP"); // depende de Users
     await queryInterface.dropTable("Queues"); // depende de Users, Businesses, Services
     await queryInterface.dropTable("Notifications"); // depende de Users
     await queryInterface.dropTable("Reviews"); // depende de Users, Services */
     await queryInterface.dropTable("Professionals"); // depende de Users, Businesses
-   /*  await queryInterface.dropTable("Services"); // depende de Businesses
+    await queryInterface.dropTable("Services");
+    await queryInterface.dropTable("BusinessPhotos"); // depende de nada// depende de Businesses
     await queryInterface.dropTable("Businesses"); // depende de nada
     await queryInterface.dropTable("Users"); // é base para várias */
   },
