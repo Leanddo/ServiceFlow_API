@@ -1,4 +1,6 @@
 const bcrypt = require("bcrypt");
+const path = require("path");
+
 const { User,OTP } = require("../../models/index");
 const { verifyToken } = require("../../utils/jwtUtils");
 const sendEmail = require("../../utils/emailSender");
@@ -80,7 +82,18 @@ exports.resendOTP = async (req, res) => {
       otpExpires: expiresAt,
     });
 
-    await sendEmail(user.email, otpCode);
+    const placeholders = {
+      USERNAME: user.username,
+      OTP: otpCode,
+    };
+
+    // Enviar o e-mail usando o novo emailSender
+    await sendEmail({
+      to: user.email,
+      subject: "Seu novo código OTP para o ServiceFlow",
+      templatePath: path.join(__dirname, "../../templates/otpTemplate.html"),
+      placeholders,
+    });
 
     return httpCode(404, { message: "Novo código enviado para o email." }, res);
   } catch (error) {

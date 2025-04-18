@@ -1,6 +1,7 @@
-const { User,OTP } = require("../../models/index");
+const { User, OTP, Professionals } = require("../../models/index");
 
 const bcrypt = require("bcrypt");
+const path = require("path");
 
 const { httpCode } = require("../../utils/httpCodeHandler");
 const { generateToken } = require("../../utils/jwtUtils");
@@ -36,6 +37,16 @@ exports.signUp = async (req, res) => {
       password: hashedPassword,
     });
 
+    // Verificar se o e-mail corresponde a um profissional existente
+    const professional = await Professionals.findOne({
+      where: { email, user_id: null },
+    });
+
+    if (professional) {
+      // Associar o utilizador recém-criado ao profissional
+      await professional.update({ user_id: createdUser.user_id });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     const hashedOtp = await bcrypt.hash(otp, 10);
@@ -46,7 +57,17 @@ exports.signUp = async (req, res) => {
       otpExpires: expiresAt,
     });
 
-    await sendEmail(email, otp);
+    const placeholders = {
+      USERNAME: username,
+      OTP: otp,
+    };
+
+    await sendEmail({
+      to: email,
+      subject: "Seu código OTP para o ServiceFlow",
+      templatePath: path.join(__dirname, "../../templates/otpTemplate.html"),
+      placeholders,
+    });
 
     const token = await generateToken(createdUser);
 

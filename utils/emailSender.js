@@ -3,9 +3,10 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 
-module.exports = async (email, code) => {
+module.exports = async ({ to, subject, templatePath, placeholders }) => {
   try {
-    let transporter = nodemailer.createTransport({
+    // Configurar o transporte do nodemailer
+    const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: 465,
       secure: true,
@@ -15,27 +16,27 @@ module.exports = async (email, code) => {
       },
     });
 
-    // Lê o ficheiro do template
-    const templatePath = path.join(
-      __dirname,
-      "../templates",
-      "otpTemplate.html"
-    );
+    // Ler o template de e-mail
     let htmlTemplate = fs.readFileSync(templatePath, "utf-8");
-    // Substitui o {{CODE}} pelo código real
-    htmlTemplate = htmlTemplate.replace("{{CODE}}", code);
 
-    let info = await transporter.sendMail({
-      from: `"ServiceFlow"`,
-      to: email.trim(),
-      subject: "O seu codigo de autenticação",
+    // Substituir os placeholders no template
+    for (const [key, value] of Object.entries(placeholders)) {
+      const regex = new RegExp(`{{${key}}}`, "g");
+      htmlTemplate = htmlTemplate.replace(regex, value);
+    }
+
+    // Configurar e enviar o e-mail
+    const info = await transporter.sendMail({
+      from: `"ServiceFlow" <${process.env.EMAIL_USER}>`,
+      to: to.trim(),
+      subject: subject,
       html: htmlTemplate,
     });
 
-    console.log("Email sent: ", info.messageId);
+    console.log("Email enviado: ", info.messageId);
     return info;
   } catch (error) {
-    console.error("Error sending email:", error);
-    throw error; // rethrow the error if needed
+    console.error("Erro ao enviar e-mail:", error);
+    throw error;
   }
 };

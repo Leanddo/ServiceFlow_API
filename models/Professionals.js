@@ -7,11 +7,7 @@ const Professionals = db.define("Professionals", {
     primaryKey: true,
     autoIncrement: true,
   },
-  professional_name: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  professional_fotoUrl: {
+  email: {
     type: Sequelize.STRING,
   },
   availability: {
@@ -22,7 +18,7 @@ const Professionals = db.define("Professionals", {
   role: {
     type: Sequelize.ENUM("Owner", "Employee", "Assistant", "Other"),
     allowNull: false,
-    defaultValue: "Funcionário",
+    defaultValue: "Employee",
   },
   status: {
     type: Sequelize.STRING,

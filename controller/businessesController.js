@@ -186,11 +186,9 @@ exports.changeBusinessStatus = async (req, res) => {
     });
 
     if (!professional || professional.role !== "Owner") {
-      return res
-        .status(403)
-        .json({
-          message: "Apenas o proprietário pode alterar o estado do negócio.",
-        });
+      return res.status(403).json({
+        message: "Apenas o proprietário pode alterar o estado do negócio.",
+      });
     }
 
     business.isActive = isActive;
@@ -249,4 +247,3 @@ exports.updateBusinessPhoto = async (req, res) => {
       .json({ message: "Erro interno ao atualizar a imagem do negócio." });
   }
 };
-

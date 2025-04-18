@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+      }
+      .header {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+      }
+      .message {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+      .link {
+        display: inline-block;
+        margin: 20px 0;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #007bff;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+      .footer {
+        font-size: 12px;
+        color: #999;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Convite para se juntar ao ServiceFlow</div>
+      <p class="message">
+        Olá {{PROFESSIONAL_NAME}},<br />
+        Você foi convidado para se juntar ao negócio <strong>{{BUSINESS_NAME}}</strong> como
+        <strong>{{ROLE}}</strong>. Para completar seu registro, clique no botão abaixo:
+      </p>
+      <a href="{{REGISTRATION_LINK}}" class="link">Registrar-se</a>
+      <p class="footer">
+        Se você não esperava este convite, por favor, ignore este e-mail.
+      </p>
+    </div>
+  </body>
+</html>

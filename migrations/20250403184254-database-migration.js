@@ -20,6 +20,7 @@ module.exports = {
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: true,
       },
       fotoUrl: {
         type: Sequelize.STRING,
@@ -31,6 +32,7 @@ module.exports = {
       google_ID: {
         type: Sequelize.STRING,
         unique: true,
+        allowNull: true,
       },
       is_verified: {
         type: Sequelize.BOOLEAN,
@@ -183,14 +185,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      professional_name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      professional_fotoUrl: {
-        type: Sequelize.STRING,
-      },
-      professional_fotoUrl: {
+      email: {
         type: Sequelize.STRING,
       },
       availability: {

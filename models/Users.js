@@ -21,6 +21,7 @@ const User = db.define("Users", {
   },
   password: {
     type: Sequelize.STRING,
+    allowNull: true, 
   },
   fotoUrl: {
     type: Sequelize.STRING,
@@ -32,6 +33,7 @@ const User = db.define("Users", {
   google_ID: {
     type: Sequelize.STRING,
     unique: true,
+    allowNull: true, 
   },
   is_verified: {
     type: Sequelize.BOOLEAN,

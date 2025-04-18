@@ -11,6 +11,7 @@ const googleRoutes = require("./routes/auth/googleRoutes.js");
 const OTPRoutes = require("./routes/auth/OTPRoute.js");
 const profileRouter = require("./routes/userRoutes.js");
 const businessesRouter = require("./routes/businessRouter.js");
+const professionalsRouter = require("./routes/professionalsRoutes");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(
   })
 );
 app.use(express.json());
+
 app.use(passport.initialize());
 
 app.use("/userImg", express.static("public/userImg"));
@@ -37,6 +39,7 @@ app.use("/api", [
   OTPRoutes,
   profileRouter,
   businessesRouter,
+  professionalsRouter,
 ]);
 
 const port = 3000;
@@ -44,3 +47,4 @@ const port = 3000;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+  
