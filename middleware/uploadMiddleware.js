@@ -1,15 +1,21 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
-const storage = (folder) => multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, `public/${folder}/`);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
+const storage = (folder) =>
+  multer.diskStorage({
+    destination: (req, file, cb) => {
+      const dir = `public/${folder}/`;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + path.extname(file.originalname));
+    },
+  });
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif/;
@@ -21,15 +27,19 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const createUploadMiddleware = (folder) => {
+const createUploadMiddleware = (folder, single = false) => {
   const upload = multer({
     storage: storage(folder),
     fileFilter,
-    limits: { fileSize: 2 * 1024 * 1024 } 
+    limits: { fileSize: 2 * 1024 * 1024 },
   });
 
   return (req, res, next) => {
-    upload.single("foto")(req, res, function (err) {
+    const uploadHandler = single
+      ? upload.single("foto")
+      : upload.array("fotos", 5);
+
+    uploadHandler(req, res, function (err) {
       if (err) {
         return res.status(400).json({ message: err.message });
       }

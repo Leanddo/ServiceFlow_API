@@ -12,6 +12,7 @@ const OTPRoutes = require("./routes/auth/OTPRoute.js");
 const profileRouter = require("./routes/userRoutes.js");
 const businessesRouter = require("./routes/businessRouter.js");
 const professionalsRouter = require("./routes/professionalsRoutes");
+const businessPhotosRoutes = require("./routes/businessPhotosRoutes.js");
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use("/api", [
   profileRouter,
   businessesRouter,
   professionalsRouter,
+  businessPhotosRoutes
 ]);
 
 const port = 3000;

@@ -66,4 +66,5 @@ module.exports = {
   Professionals,
   OTP,
   Notifications,
+  BusinessesPhotos
 };

@@ -342,6 +342,7 @@ module.exports = {
       },
     });
   },
+  
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("OTP"); // depende de Users
     await queryInterface.dropTable("Queues"); // depende de Users, Businesses, Services

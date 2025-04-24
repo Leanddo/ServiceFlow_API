@@ -174,6 +174,7 @@ exports.updateProfessional = async (req, res) => {
         message: "Apenas o proprietário pode adicionar profissionais.",
       });
     }
+    
     const { id } = req.params;
     const { availability, role, status } = req.body;
 
