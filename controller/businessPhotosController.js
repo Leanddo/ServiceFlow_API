@@ -1,8 +1,4 @@
-const {
-  Businesses,
-  BusinessesPhotos,
-  Professionals,
-} = require("../models/index");
+const { Businesses, BusinessesPhotos } = require("../models/index");
 
 exports.getBusinessPhotos = async (req, res) => {
   try {
@@ -27,16 +23,6 @@ exports.getBusinessPhotos = async (req, res) => {
 
 exports.addBusinessPhotos = async (req, res) => {
   try {
-    const professional = await Professionals.findOne({
-      where: { user_id: req.user.user_id },
-    });
-
-    if (!professional || professional.role !== "Owner") {
-      return res.status(403).json({
-        message: "Apenas o proprietário pode adicionar fotos ao negócio.",
-      });
-    }
-
     const { business_id } = req.params;
     const { description } = req.body;
 
@@ -75,16 +61,6 @@ exports.addBusinessPhotos = async (req, res) => {
 
 exports.deleteBusinessPhoto = async (req, res) => {
   try {
-    const professional = await Professionals.findOne({
-      where: { user_id: req.user.user_id },
-    });
-
-    if (!professional || professional.role !== "Owner") {
-      return res.status(403).json({
-        message: "Apenas o proprietário pode adicionar fotos ao negócio.",
-      });
-    }
-
     const { business_id, photo_id } = req.params;
 
     const photo = await BusinessesPhotos.findOne({

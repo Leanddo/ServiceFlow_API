@@ -112,6 +112,16 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: true,
       },
+      opening_hour: {
+        type: Sequelize.TIME, // Hora de abertura no formato HH:mm:ss
+        allowNull: false,
+        defaultValue: "09:00:00", // Valor padrão: 9h
+      },
+      closing_hour: {
+        type: Sequelize.TIME, // Hora de fechamento no formato HH:mm:ss
+        allowNull: false,
+        defaultValue: "18:00:00", // Valor padrão: 18h
+      },
     });
 
     await queryInterface.createTable("BusinessPhotos", {
@@ -158,6 +168,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      service_fotoUrl: {
+        type: Sequelize.STRING,
+      },
       price: {
         type: Sequelize.DOUBLE,
         allowNull: false,
@@ -169,6 +182,10 @@ module.exports = {
       category: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
       business_id: {
         type: Sequelize.INTEGER,
@@ -198,10 +215,9 @@ module.exports = {
         allowNull: false,
         defaultValue: "Employee",
       },
-      status: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: "active",
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
       business_id: {
         type: Sequelize.INTEGER,
@@ -296,6 +312,10 @@ module.exports = {
         type: Sequelize.TIME,
         allowNull: false,
       },
+      queue_date: {
+        type: Sequelize.DATE,
+        allowNull: false, // Data e hora do serviço
+      },
       user_id: {
         type: Sequelize.INTEGER,
         references: {
@@ -315,6 +335,13 @@ module.exports = {
         references: {
           model: "Businesses",
           key: "business_id",
+        },
+      },
+      professional_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Professionals",
+          key: "professional_id",
         },
       },
     });
@@ -342,7 +369,7 @@ module.exports = {
       },
     });
   },
-  
+
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("OTP"); // depende de Users
     await queryInterface.dropTable("Queues"); // depende de Users, Businesses, Services

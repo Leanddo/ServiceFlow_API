@@ -15,6 +15,9 @@ const Services = db.define("Services", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  service_fotoUrl: {
+    type: Sequelize.STRING,
+  },
   price: {
     type: Sequelize.DOUBLE,
     allowNull: false,
@@ -22,17 +25,19 @@ const Services = db.define("Services", {
   duration: {
     type: Sequelize.DOUBLE,
     allowNull: false,
+    defaultValue: 30,
   },
   category: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  category: {
-    type: Sequelize.STRING,
-    allowNull: false,
+  isActive: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: true,
   },
   business_id: {
     type: Sequelize.INTEGER,
+    allowNull: false,
     references: {
       model: "Businesses",
       key: "business_id",

@@ -55,6 +55,17 @@ BusinessesPhotos.belongsTo(Businesses, {
   as: "business",
 });
 
+// Relacionamento entre Queues e Professionals
+Queues.belongsTo(Professionals, {
+  foreignKey: "professional_id",
+  onDelete: "CASCADE",
+});
+
+Professionals.hasMany(Queues, {
+  foreignKey: "professional_id",
+  onDelete: "CASCADE",
+});
+
 // Exportar todos os modelos
 module.exports = {
   db,
@@ -66,5 +77,5 @@ module.exports = {
   Professionals,
   OTP,
   Notifications,
-  BusinessesPhotos
+  BusinessesPhotos,
 };

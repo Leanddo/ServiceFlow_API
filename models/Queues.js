@@ -15,6 +15,10 @@ const Queues = db.define("Queues", {
     type: Sequelize.TIME,
     allowNull: false,
   },
+  queue_date: {
+    type: Sequelize.DATE,
+    allowNull: false, // Data e hora do serviço
+  },
   user_id: {
     type: Sequelize.INTEGER,
     references: {
@@ -36,7 +40,13 @@ const Queues = db.define("Queues", {
       key: "business_id",
     },
   },
+  professional_id: {
+    type: Sequelize.INTEGER,
+    references: {
+      model: "Professionals",
+      key: "professional_id",
+    },
+  },
 });
-
 
 module.exports = { Queues };

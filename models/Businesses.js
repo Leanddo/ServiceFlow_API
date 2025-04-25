@@ -68,6 +68,16 @@ const Businesses = db.define("Businesses", {
     type: Sequelize.BOOLEAN,
     defaultValue: true,
   },
+  opening_hour: {
+    type: Sequelize.TIME, // Hora de abertura no formato HH:mm:ss
+    allowNull: false,
+    defaultValue: "09:00:00", // Valor padrão: 9h
+  },
+  closing_hour: {
+    type: Sequelize.TIME, // Hora de fechamento no formato HH:mm:ss
+    allowNull: false,
+    defaultValue: "18:00:00", // Valor padrão: 18h
+  },
 });
 
 module.exports = { Businesses };

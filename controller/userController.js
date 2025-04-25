@@ -21,24 +21,24 @@ exports.getProfile = async (req, res) => {
     });
 
     if (!user) {
-      return httpCode(404, { message: "Utilizador não encontrado" }, res);
+      return res.status(404).json({ message: "Utilizador não encontrado" });
     }
 
-    return httpCode(200, { profile: user }, res);
+    return res.status(200).json({ profile: user });
   } catch (err) {
     console.error("Erro ao buscar perfil:", err);
-    return httpCode(500, { message: "Erro interno ao buscar perfil" }, res);
+    return res.status(500).json({ message: "Erro interno ao buscar perfil" });
   }
 };
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { username } = req.body || {}; 
-    
+    const { username } = req.body || {};
+
     const user = await User.findByPk(req.user.user_id);
 
     if (!user) {
-      return httpCode(404, { message: "Utilizador não encontrado" }, res);
+      return res.status(404).json({ message: "Utilizador não encontrado" });
     }
 
     // Se há nova imagem e já existe uma antiga, apaga a antiga
@@ -69,28 +69,27 @@ exports.updateProfile = async (req, res) => {
 
     await user.save();
 
-    return httpCode(200, { message: "Perfil atualizado com sucesso" }, res);
+    return res
+      .status(200)
+      .json({ message: "Perfil atualizado com sucesso", fotoUrl: user.fotoUrl });
   } catch (err) {
     console.error("Erro ao atualizar perfil:", err);
-    return httpCode(500, { message: "Erro interno ao atualizar perfil" }, res);
+    return res.status(500).json({ message: "Erro interno ao atualizar perfil" });
   }
 };
-
 
 exports.deleteProfileImage = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.user_id);
 
     if (!user) {
-      return httpCode(404, { message: "Utilizador não encontrado" }, res);
+      return res.status(404).json({ message: "Utilizador não encontrado" });
     }
 
     if (!user.fotoUrl) {
-      return httpCode(
-        400,    
-        { message: "Não há imagem de perfil para remover" },
-        res
-      );
+      return res
+        .status(400)
+        .json({ message: "Não há imagem de perfil para remover" });
     }
 
     const filePath = path.join("public", user.fotoUrl);
@@ -99,18 +98,14 @@ exports.deleteProfileImage = async (req, res) => {
     user.fotoUrl = null;
     await user.save();
 
-    return httpCode(
-      200,
-      { message: "Imagem de perfil removida com sucesso" },
-      res
-    );
+    return res
+      .status(200)
+      .json({ message: "Imagem de perfil removida com sucesso" });
   } catch (err) {
     console.error("Erro ao remover imagem de perfil:", err);
-    return httpCode(
-      500,
-      { message: "Erro interno ao remover imagem de perfil" },
-      res
-    );
+    return res
+      .status(500)
+      .json({ message: "Erro interno ao remover imagem de perfil" });
   }
 };
 
@@ -120,24 +115,22 @@ exports.updatePassword = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.user_id);
     if (!user)
-      return httpCode(404, { message: "Utilizador não encontrado" }, res);
+      return res.status(404).json({ message: "Utilizador não encontrado" });
 
     const passwordMatch = await bcrypt.compare(currentPassword, user.password);
     if (!passwordMatch)
-      return httpCode(400, { message: "Palavra-passe atual incorreta" }, res);
+      return res.status(400).json({ message: "Palavra-passe atual incorreta" });
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
 
-    return httpCode(
-      200,
-      { message: "Palavra-passe atualizada com sucesso" },
-      res
-    );
+    return res
+      .status(200)
+      .json({ message: "Palavra-passe atualizada com sucesso" });
   } catch (err) {
     console.error("Erro ao atualizar palavra-passe:", err);
-    return httpCode(500, { message: "Erro interno" }, res);
+    return res.status(500).json({ message: "Erro interno" });
   }
 };
 
@@ -147,11 +140,11 @@ exports.deleteAccount = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.user_id);
     if (!user)
-      return httpCode(404, { message: "Utilizador não encontrado" }, res);
+      return res.status(404).json({ message: "Utilizador não encontrado" });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
-      return httpCode(401, { message: "Palavra-passe incorreta" }, res);
+      return res.status(401).json({ message: "Palavra-passe incorreta" });
 
     if (user.fotoUrl) {
       const imgPath = path.join(
@@ -171,9 +164,11 @@ exports.deleteAccount = async (req, res) => {
     await OTP.destroy({ where: { user_id: user.user_id } });
     await user.destroy();
 
-    return httpCode(200, { message: "Conta eliminada com sucesso" }, res);
+    return res.status(200).json({ message: "Conta eliminada com sucesso" });
   } catch (err) {
     console.error("Erro ao eliminar conta:", err);
-    return httpCode(500, { message: "Erro interno ao eliminar conta" }, res);
+    return res
+      .status(500)
+      .json({ message: "Erro interno ao eliminar conta" });
   }
 };

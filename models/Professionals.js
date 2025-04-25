@@ -20,10 +20,9 @@ const Professionals = db.define("Professionals", {
     allowNull: false,
     defaultValue: "Employee",
   },
-  status: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    defaultValue: "active",
+  isActive: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: true,
   },
   business_id: {
     type: Sequelize.INTEGER,

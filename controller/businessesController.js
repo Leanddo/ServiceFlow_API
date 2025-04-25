@@ -1,5 +1,7 @@
-const { Businesses, Professionals } = require("../models/index");
+const { Businesses, Professionals, User } = require("../models/index");
 const { Op } = require("sequelize");
+const path = require("path");
+const fs = require("fs");
 
 exports.createBusiness = async (req, res) => {
   const {
@@ -40,6 +42,11 @@ exports.createBusiness = async (req, res) => {
       });
     }
 
+    const user = await User.findByPk(req.user.user_id);
+    if (!user || !user.email) {
+      return res.status(400).json({ message: "Usuário autenticado não possui um e-mail válido." });
+    }
+
     const newBusiness = await Businesses.create({
       business_name,
       business_address,
@@ -51,12 +58,11 @@ exports.createBusiness = async (req, res) => {
     });
 
     await Professionals.create({
-      professional_name: "Owner",
-      specialty: "Administração",
-      availability: "Full-time",
-      business_id: newBusiness.business_id,
       user_id: req.user.user_id,
+      business_id: newBusiness.business_id,
       role: "Owner",
+      email: user.email, // Usar o e-mail do usuário autenticado
+      availability: "Full-time", // Disponibilidade padrão
     });
 
     res.status(201).json(newBusiness);
@@ -139,17 +145,15 @@ exports.updateBusiness = async (req, res) => {
       return res.status(404).json({ message: "Negócio não encontrado." });
     }
 
-    const businessOwnerOrManager = await Professionals.findOne({
-      where: { user_id: req.user.user_id, business_id: business_id },
+    // Verificar se o usuário autenticado pertence ao negócio
+    const professional = await Professionals.findOne({
+      where: { user_id: req.user.user_id, business_id },
     });
-    if (!businessOwnerOrManager) {
-      return res.status(404).json({ message: "Utilizador não encontrado." });
-    }
 
-    if (!["Owner", "Manager"].includes(businessOwnerOrManager.role)) {
-      return res
-        .status(403)
-        .json({ message: "Não tem permissão para atualizar este negócio." });
+    if (!professional) {
+      return res.status(403).json({
+        message: "Você não tem permissão para atualizar este negócio.",
+      });
     }
 
     const updatedBusiness = await business.update({
@@ -181,16 +185,6 @@ exports.changeBusinessStatus = async (req, res) => {
       return res.status(404).json({ message: "Negócio não encontrado." });
     }
 
-    const professional = await Professionals.findOne({
-      where: { user_id: req.user.user_id, business_id },
-    });
-
-    if (!professional || professional.role !== "Owner") {
-      return res.status(403).json({
-        message: "Apenas o proprietário pode alterar o estado do negócio.",
-      });
-    }
-
     business.isActive = isActive;
     await business.save();
 
@@ -214,6 +208,8 @@ exports.updateBusinessPhoto = async (req, res) => {
       return res.status(404).json({ message: "Negócio não encontrado." });
     }
 
+    console.log(req.file);
+    
     // Verifica se tem uma imagem antiga e apaga
     if (req.file && business.main_photo_url) {
       const oldImagePath = path.join(

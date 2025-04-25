@@ -27,7 +27,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const createUploadMiddleware = (folder, single = false) => {
+const createUploadMiddleware = (folder, single = true) => {
   const upload = multer({
     storage: storage(folder),
     fileFilter,

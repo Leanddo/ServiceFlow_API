@@ -2,28 +2,44 @@ const express = require("express");
 const Router = express.Router();
 const professionalsController = require("../controller/professionalsController");
 const { requireAuth } = require("../middleware/authMiddleware");
+const isOwnerOrManager = require("../middleware/isOwnerOrManagerMiddleware");
 
-// Rotas para profissionais
-Router.get("/professionals/", professionalsController.getAllProfessionals); // Listar todos os profissionais
+// Listar todos os profissionais (com paginação ou filtros, se necessário)
 Router.get(
-  "/professionals/:business_id",
-  professionalsController.getProfessionalsByBusinessId
-); // Obter um profissional por Business ID
-
-Router.post(
-  "/professionals/:business_id",
+  "/professionals",
   requireAuth,
+  professionalsController.getAllProfessionals
+);
+
+// Obter todos os profissionais de um negócio
+Router.get(
+  "/businesses/:business_id/professionals",
+  requireAuth,
+  professionalsController.getProfessionalsByBusinessId
+);
+
+// Criar um novo profissional para um negócio
+Router.post(
+  "/businesses/:business_id/professionals",
+  requireAuth,
+  isOwnerOrManager,
   professionalsController.createProfessional
-); // Criar um novo profissional
+);
+
+// Atualizar um profissional existente
 Router.put(
   "/professionals/:id",
   requireAuth,
+  isOwnerOrManager,
   professionalsController.updateProfessional
-); // Atualizar um profissional existente
+);
+
+// Deletar um profissional
 Router.delete(
   "/professionals/:id",
   requireAuth,
+  isOwnerOrManager,
   professionalsController.deleteProfessional
-); // Deletar um profissional
+);
 
 module.exports = Router;

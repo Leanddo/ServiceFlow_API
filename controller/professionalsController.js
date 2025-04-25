@@ -55,28 +55,9 @@ exports.getProfessionalsByBusinessId = async (req, res) => {
 
 exports.createProfessional = async (req, res) => {
   try {
-    // Verificar se o usuário autenticado é "Owner"
-    const professional = await Professionals.findOne({
-      where: { user_id: req.user.user_id },
-    });
-
-    if (!professional || professional.role !== "Owner") {
-      return res.status(403).json({
-        message: "Apenas o proprietário pode adicionar profissionais.",
-      });
-    }
-
     // Recuperar os dados do corpo da requisição
     const { business_id } = req.params;
-    const { availability, role, email } = req.body;
-
-    console.log(business_id, professional.business_id);
-
-    if (business_id === !professional.business_id) {
-      return res.status(403).json({
-        message: "Você só pode adicionar profissionais ao seu próprio negócio.",
-      });
-    }
+    const { availability, role, email, isActive } = req.body;
 
     // Validar campos obrigatórios
     if (!role || !business_id || !email || !availability) {
@@ -85,11 +66,30 @@ exports.createProfessional = async (req, res) => {
         .json({ message: "Campos obrigatórios não preenchidos." });
     }
 
+    // Validar o campo isActive
+    if (isActive !== undefined && typeof isActive !== "boolean") {
+      return res
+        .status(400)
+        .json({ message: "O campo 'isActive' deve ser true ou false." });
+    }
+
+    // Buscar o negócio
     const business = await Businesses.findByPk(business_id);
     if (!business) {
       return res
         .status(404)
         .json({ message: "O negócio fornecido não existe." });
+    }
+
+    // Verificar se o profissional autenticado pertence ao mesmo negócio
+    const authenticatedProfessional = await Professionals.findOne({
+      where: { user_id: req.user.user_id, business_id },
+    });
+
+    if (!authenticatedProfessional) {
+      return res.status(403).json({
+        message: "Você só pode adicionar profissionais ao seu próprio negócio.",
+      });
     }
 
     // Validar disponibilidade
@@ -144,7 +144,8 @@ exports.createProfessional = async (req, res) => {
       role,
       business_id,
       email,
-      user_id: existingUser ? existingUser.user_id : null, // Associa ao utilizador existente ou deixa como null
+      user_id: existingUser ? existingUser.user_id : null,
+      isActive: isActive !== undefined ? isActive : true, // Valor padrão: true
     });
 
     const successMessage = emailSent
@@ -164,79 +165,85 @@ exports.createProfessional = async (req, res) => {
 // Atualizar um profissional existente
 exports.updateProfessional = async (req, res) => {
   try {
-    // Verificar se o usuário autenticado é "Owner"
-    const professional = await Professionals.findOne({
-      where: { user_id: req.user.user_id },
-    });
-
-    if (!professional || professional.role !== "Owner") {
-      return res.status(403).json({
-        message: "Apenas o proprietário pode adicionar profissionais.",
-      });
-    }
-    
     const { id } = req.params;
-    const { availability, role, status } = req.body;
-
-    validateAvailability(availability);
-
-    const updateProfessional = await Professionals.findByPk(id);
-
-    if (!updateProfessional) {
-      return res.status(404).json({ message: "Profissional não encontrado" });
-    }
-
-    console.log(updateProfessional.business_id == professional.business_id);
-
-    // Verificar se o profissional pertence ao mesmo negócio
-    if (updateProfessional.business_id !== professional.business_id) {
-      return res.status(403).json({
-        message: "Você só pode atualizar profissionais do seu próprio negócio.",
-      });
-    }
+    const { availability, role, isActive } = req.body;
 
     // Validar disponibilidade, se fornecida
     if (availability) {
       validateAvailability(availability);
     }
 
-    await updateProfessional.update({
-      availability,
-      role,
-      status,
-    });
+    // Validar o campo isActive, se fornecido
+    if (isActive !== undefined && typeof isActive !== "boolean") {
+      return res
+        .status(400)
+        .json({ message: "O campo 'isActive' deve ser true ou false." });
+    }
 
-    res.status(200).json({ message: "Profissional atualizado com sucesso" });
-  } catch (error) {
-    console.error("Erro ao atualizar profissional:", error);
-    res.status(500).json({ message: "Erro ao atualizar profissional", error });
-  }
-};
+    // Buscar o profissional que será atualizado
+    const updateProfessional = await Professionals.findByPk(id);
 
-// Deletar um profissional
-exports.deleteProfessional = async (req, res) => {
-  try {
-    // Verificar se o usuário autenticado é "Owner"
-    const professional = await Professionals.findOne({
+    if (!updateProfessional) {
+      return res.status(404).json({ message: "Profissional não encontrado." });
+    }
+
+    // Verificar se o profissional autenticado pertence ao mesmo negócio
+    const authenticatedProfessional = await Professionals.findOne({
       where: { user_id: req.user.user_id },
     });
 
-    if (!professional || professional.role !== "Owner") {
+    if (
+      !authenticatedProfessional ||
+      updateProfessional.business_id !== authenticatedProfessional.business_id
+    ) {
       return res.status(403).json({
-        message: "Apenas o proprietário pode adicionar profissionais.",
+        message: "Você só pode atualizar profissionais do seu próprio negócio.",
       });
     }
 
+    // Atualizar o profissional
+    await updateProfessional.update({
+      availability,
+      role,
+      isActive, // Atualiza apenas se fornecido
+    });
+
+    res.status(200).json({ message: "Profissional atualizado com sucesso." });
+  } catch (error) {
+    console.error("Erro ao atualizar profissional:", error);
+    res.status(500).json({ message: "Erro ao atualizar profissional.", error });
+  }
+};
+
+exports.deleteProfessional = async (req, res) => {
+  try {
     const { id } = req.params;
 
+    // Buscar o profissional que será deletado
     const deleteProfessional = await Professionals.findByPk(id);
 
     if (!deleteProfessional) {
-      return res.status(404).json({ message: "Profissional não encontrado" });
+      return res.status(404).json({ message: "Profissional não encontrado." });
     }
 
+    // Verificar se o profissional autenticado pertence ao mesmo negócio
+    const authenticatedProfessional = await Professionals.findOne({
+      where: { user_id: req.user.user_id },
+    });
+
+    if (
+      !authenticatedProfessional ||
+      deleteProfessional.business_id !== authenticatedProfessional.business_id
+    ) {
+      return res.status(403).json({
+        message: "Você só pode deletar profissionais do seu próprio negócio.",
+      });
+    }
+
+    // Deletar o profissional
     await deleteProfessional.destroy();
-    res.status(200).json({ message: "Profissional deletado com sucesso" });
+
+    res.status(200).json({ message: "Profissional deletado com sucesso." });
   } catch (error) {
     console.error("Erro ao deletar profissional:", error);
     res.status(500).json({ message: "Erro ao deletar profissional", error });

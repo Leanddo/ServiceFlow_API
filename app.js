@@ -13,6 +13,8 @@ const profileRouter = require("./routes/userRoutes.js");
 const businessesRouter = require("./routes/businessRouter.js");
 const professionalsRouter = require("./routes/professionalsRoutes");
 const businessPhotosRoutes = require("./routes/businessPhotosRoutes.js");
+const servicesRoutes = require("./routes/servicesRoutes");
+const queuesRoutes = require("./routes/queuesRoutes");
 
 const app = express();
 
@@ -41,7 +43,9 @@ app.use("/api", [
   profileRouter,
   businessesRouter,
   professionalsRouter,
-  businessPhotosRoutes
+  businessPhotosRoutes,
+  servicesRoutes,
+  queuesRoutes,
 ]);
 
 const port = 3000;
