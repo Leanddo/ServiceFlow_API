@@ -28,6 +28,7 @@ const Queues = db.define("Queues", {
   },
   service_id: {
     type: Sequelize.INTEGER,
+    allowNull: false,
     references: {
       model: "Services",
       key: "service_id",
@@ -35,6 +36,7 @@ const Queues = db.define("Queues", {
   },
   business_id: {
     type: Sequelize.INTEGER,
+    allowNull: false,
     references: {
       model: "Businesses",
       key: "business_id",
@@ -42,10 +44,17 @@ const Queues = db.define("Queues", {
   },
   professional_id: {
     type: Sequelize.INTEGER,
+    allowNull: true,
     references: {
       model: "Professionals",
       key: "professional_id",
     },
+  },
+  client_name: {
+    type: Sequelize.STRING,
+  },
+  client_email: {
+    type: Sequelize.STRING,
   },
 });
 

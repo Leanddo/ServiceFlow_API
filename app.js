@@ -16,13 +16,19 @@ const businessPhotosRoutes = require("./routes/businessPhotosRoutes.js");
 const servicesRoutes = require("./routes/servicesRoutes");
 const queuesRoutes = require("./routes/queuesRoutes");
 
+const scheduleNotificationAppointment = require("./notifications/notificationsApoitment");
+const limiter = require("./utils/requestsLimiter.js");
+
 const app = express();
+
+app.use(limiter);
 
 db.authenticate()
   .then(() => console.log("database connected"))
   .catch((err) => console.log("Error connecting to the database", err));
 
 app.use(cookieParser());
+
 app.use(
   cors({
     origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
@@ -30,6 +36,7 @@ app.use(
     methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
   })
 );
+
 app.use(express.json());
 
 app.use(passport.initialize());
@@ -48,9 +55,10 @@ app.use("/api", [
   queuesRoutes,
 ]);
 
+scheduleNotificationAppointment();
+
 const port = 3000;
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-  

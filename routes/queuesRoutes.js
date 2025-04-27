@@ -3,6 +3,13 @@ const router = express.Router();
 const queuesController = require("../controller/queuesController");
 const { requireAuth } = require("../middleware/authMiddleware");
 
+// Inscrever um cliente em um serviço sem conta
+router.post(
+  "/services/:service_id/queues/no-account",
+  requireAuth,
+  queuesController.addToQueueWithoutAccount
+);
+
 // Inscrever um cliente em um serviço
 router.post(
   "/services/:service_id/queues",
@@ -30,5 +37,7 @@ router.get(
   requireAuth,
   queuesController.getAvailableTimes
 );
+
+router.get("/client/queues", requireAuth, queuesController.getQueueByClient);
 
 module.exports = router;

@@ -4,7 +4,8 @@ exports.generateToken = (user) => {
   return new Promise((resolve, reject) => {
     jwt.sign(
       { user_id: user.user_id,
-        username: user.username
+        username: user.username,
+        email: user.email
        },
       process.env.JWTSECRET,
       { expiresIn: "1w" },

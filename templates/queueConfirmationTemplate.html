@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmação de Inscrição</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .email-header {
+      background-color: #4CAF50;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px;
+    }
+    .email-header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .email-body {
+      padding: 20px;
+      color: #333333;
+      line-height: 1.6;
+    }
+    .email-body p {
+      margin: 10px 0;
+    }
+    .email-body a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+    .email-footer {
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      color: #666666;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="email-header">
+      <h1>Confirmação de Inscrição</h1>
+    </div>
+    <div class="email-body">
+      <p>Olá, <strong>{{USERNAME}}</strong>!</p>
+      <p>Você foi inscrito com sucesso na fila do serviço <strong>{{SERVICE_NAME}}</strong> no negócio <strong>{{BUSINESS_NAME}}</strong>.</p>
+      <p><strong>Data e Hora:</strong> {{QUEUE_DATE}}</p>
+      <p>Se desejar cancelar sua inscrição, clique no link abaixo:</p>
+      <p><a href="{{DELETE_LINK}}" target="_blank">Cancelar Inscrição</a></p>
+    </div>
+    <div class="email-footer">
+      <p>Atenciosamente,</p>
+      <p>Equipe <strong>ServiceFlow</strong></p>
+    </div>
+  </div>
+</body>
+</html>

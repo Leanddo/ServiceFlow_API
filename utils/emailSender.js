@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 
-module.exports = async ({ to, subject, templatePath, placeholders }) => {
+module.exports = async ({ to, subject, templatePath, placeholders,attachments }) => {
   try {
     // Configurar o transporte do nodemailer
     const transporter = nodemailer.createTransport({
@@ -31,6 +31,7 @@ module.exports = async ({ to, subject, templatePath, placeholders }) => {
       to: to.trim(),
       subject: subject,
       html: htmlTemplate,
+      attachments, // Adicionar os anexos
     });
 
     console.log("Email enviado: ", info.messageId);
