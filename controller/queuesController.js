@@ -84,6 +84,7 @@ exports.addToQueue = async (req, res) => {
         business_id: service.business_id,
         queue_date,
         professional_id: availableProfessionals.map((p) => p.professional_id),
+        status: { [Op.not]: "canceled" },
       },
     });
 
@@ -200,45 +201,6 @@ exports.addToQueue = async (req, res) => {
   } catch (error) {
     console.error("Erro ao adicionar à fila:", error);
     res.status(500).json({ message: "Erro ao adicionar à fila.", error });
-  }
-};
-
-exports.getQueueByService = async (req, res) => {
-  try {
-    const { service_id } = req.params;
-
-    // Obter a fila do serviço
-    const queue = await Queues.findAll({
-      where: { service_id },
-      include: [
-        {
-          model: Professionals,
-          include: [
-            {
-              model: User, // Relacionamento com a tabela Users
-              attributes: ["username", "email"], // Buscar apenas 'name' e 'email'
-            },
-          ],
-          attributes: [], // Não precisamos de outros campos de Professionals
-        },
-        {
-          model: Services, // Relacionamento com a tabela Services
-          attributes: ["service_name"], // Buscar apenas 'service_name'
-        },
-      ],
-      attributes: [
-        "queue_id",
-        "queue_position",
-        "queue_estimate_wait_time",
-        "queue_date",
-      ], // Campos da tabela Queues
-      order: [["queue_position", "ASC"]],
-    });
-
-    res.status(200).json(queue);
-  } catch (error) {
-    console.error("Erro ao buscar fila:", error);
-    res.status(500).json({ message: "Erro ao buscar fila.", error });
   }
 };
 
@@ -367,66 +329,22 @@ exports.getAvailableTimes = async (req, res) => {
   }
 };
 
-exports.getQueueByClient = async (req, res) => {
-  try {
-    const userId = req.user.user_id; // Obter o ID do cliente autenticado
-
-    // Buscar as filas associadas ao cliente
-    const queues = await Queues.findAll({
-      where: { user_id: userId },
-      include: [
-        {
-          model: Services,
-          attributes: ["service_name"], // Buscar apenas o nome do serviço
-        },
-        {
-          model: Businesses,
-          attributes: ["business_name", "business_address"], // Buscar informações do negócio
-        },
-      ],
-      attributes: [
-        "queue_id",
-        "queue_position",
-        "queue_estimate_wait_time",
-        "queue_date",
-        "status", // Certifique-se de que o campo `status` existe na tabela
-      ],
-      order: [["queue_date", "ASC"]], // Ordenar por data
-    });
-
-    if (queues.length === 0) {
-      return res.status(404).json({ message: "Nenhuma inscrição encontrada." });
-    }
-
-    res.status(200).json(queues);
-  } catch (error) {
-    console.error("Erro ao buscar filas do cliente:", error);
-    res
-      .status(500)
-      .json({ message: "Erro ao buscar filas do cliente.", error });
-  }
-};
-
-exports.addToQueueWithoutAccount = async (req, res) => {
+exports.addToQueueOwner = async (req, res) => {
   try {
     const { service_id } = req.params;
     const { queue_date, client_name, client_email } = req.body;
-
-    console.log("Service ID recebido:", service_id);
 
     // Verificar se o serviço existe
     const service = await Services.findByPk(service_id);
     if (!service) {
       return res.status(404).json({ message: "Serviço não encontrado." });
     }
-    console.log("Serviço encontrado:", service);
 
     // Verificar se o negócio existe
     const business = await Businesses.findByPk(service.business_id);
     if (!business) {
       return res.status(404).json({ message: "Negócio não encontrado." });
     }
-    console.log("Negócio encontrado:", business);
 
     // Verificar se o usuário autenticado é Owner ou Manager
     const professional = await Professionals.findOne({
@@ -443,7 +361,7 @@ exports.addToQueueWithoutAccount = async (req, res) => {
       });
     }
 
-    console.log("Usuário autenticado é:", professional.role);
+    const user = await User.findOne({ where: { email: client_email } });
 
     // Obter os horários de abertura e fechamento do negócio
     const openingTime = new Date(queue_date);
@@ -473,12 +391,13 @@ exports.addToQueueWithoutAccount = async (req, res) => {
         .json({ message: "Nenhum profissional disponível para este horário." });
     }
 
-    // Verificar conflitos de horários
+    // Verificar conflitos de horários, ignorando filas com status "canceled"
     const conflictingQueues = await Queues.findAll({
       where: {
         business_id: service.business_id,
         queue_date,
         professional_id: availableProfessionals.map((p) => p.professional_id),
+        status: { [Op.not]: "canceled" },
       },
     });
 
@@ -516,13 +435,11 @@ exports.addToQueueWithoutAccount = async (req, res) => {
       queue_date,
       client_name, // Nome do cliente
       client_email, // E-mail do cliente
+      user_id: user ? user.user_id : null, // Associar o user_id se o usuário existir
       service_id,
       business_id: service.business_id,
       professional_id: assignedProfessional.professional_id,
     });
-
-    console.log(newQueue);
-    
 
     // Gerar o arquivo .ics
     const event = {
@@ -604,5 +521,162 @@ exports.addToQueueWithoutAccount = async (req, res) => {
   } catch (error) {
     console.error("Erro ao adicionar à fila:", error);
     res.status(500).json({ message: "Erro ao adicionar à fila.", error });
+  }
+};
+
+exports.getQueues = async (req, res) => {
+  try {
+    const { service_id, start_date, end_date } = req.query; // Filtros opcionais
+
+    // Buscar o profissional associado ao usuário autenticado
+    const professional = await Professionals.findOne({
+      where: { user_id: req.user.user_id },
+    });
+
+    if (!professional) {
+      return res.status(404).json({ message: "Profissional não encontrado." });
+    }
+
+    // Verificar se o profissional faz parte de um negócio válido
+    const business = await Businesses.findByPk(professional.business_id);
+    if (!business) {
+      return res
+        .status(404)
+        .json({ message: "Negócio associado não encontrado." });
+    }
+
+    // Construir os filtros dinamicamente
+    const filters = {};
+
+    // Se o usuário for Owner ou Manager, ele verá todas as filas do negócio
+    if (["Owner", "Manager"].includes(professional.role)) {
+      filters.business_id = professional.business_id;
+    } else {
+      // Caso contrário, ele verá apenas as filas que ele irá atender
+      filters.professional_id = professional.professional_id;
+    }
+
+    if (service_id) {
+      filters.service_id = service_id;
+    }
+
+    if (start_date && end_date) {
+      filters.queue_date = {
+        [Op.between]: [new Date(start_date), new Date(end_date)],
+      };
+    }
+
+    // Buscar as filas com os filtros aplicados
+    const queues = await Queues.findAll({
+      where: filters,
+      include: [
+        {
+          model: Services,
+          attributes: ["service_name"], // Nome do serviço
+        },
+        {
+          model: Businesses,
+          attributes: ["business_name", "business_address"], // Informações do negócio
+        },
+        {
+          model: User,
+          attributes: ["username", "email"], // Nome e e-mail do usuário, se existir
+        },
+      ],
+      attributes: [
+        "queue_id",
+        "queue_position",
+        "queue_estimate_wait_time",
+        "queue_date",
+        "status",
+        "client_name", // Nome do cliente, se não houver user_id
+        "client_email", // E-mail do cliente, se não houver user_id
+        "user_id", // ID do usuário, se existir
+      ],
+      order: [["queue_date", "ASC"]], // Ordenar por data
+    });
+
+    if (queues.length === 0) {
+      return res.status(404).json({
+        message: "Nenhuma inscrição encontrada com os filtros aplicados.",
+      });
+    }
+
+    // Formatar a resposta para incluir o nome e o e-mail corretos
+    const formattedQueues = queues.map((queue) => ({
+      queue_id: queue.queue_id,
+      queue_position: queue.queue_position,
+      queue_estimate_wait_time: queue.queue_estimate_wait_time,
+      queue_date: queue.queue_date,
+      status: queue.status,
+      client_name: queue.user_id ? queue.User.username : queue.client_name,
+      client_email: queue.user_id ? queue.User.email : queue.client_email,
+      service_name: queue.Service.service_name,
+      business_name: queue.Business.business_name,
+      business_address: queue.Business.business_address,
+    }));
+
+    res.status(200).json(formattedQueues);
+  } catch (error) {
+    console.error("Erro ao buscar filas:", error);
+    res.status(500).json({ message: "Erro ao buscar filas.", error });
+  }
+};
+
+exports.updateQueueStatus = async (req, res) => {
+  try {
+    const { queue_id } = req.params;
+    const { status } = req.body;
+
+    // Validar o status fornecido
+    const validStatuses = ["waiting", "in_progress", "completed", "canceled"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Status inválido." });
+    }
+
+    // Buscar a fila pelo ID
+    const queue = await Queues.findByPk(queue_id);
+    if (!queue) {
+      return res.status(404).json({ message: "Fila não encontrada." });
+    }
+
+    // Verificar se o usuário é o cliente ou o profissional associado
+    const isClient = queue.user_id === req.user.user_id;
+    const isProfessional = await Professionals.findOne({
+      where: {
+        user_id: req.user.user_id,
+        professional_id: queue.professional_id,
+      },
+    });
+
+    if (isClient) {
+      // Clientes só podem alterar o status para "canceled"
+      if (status !== "canceled") {
+        return res.status(403).json({
+          message: "Clientes só podem alterar o status para 'canceled'.",
+        });
+      }
+    } else if (isProfessional) {
+      // Profissionais podem alterar o status para qualquer valor válido
+    } else {
+      // Caso contrário, o usuário não tem permissão
+      return res.status(403).json({
+        message: "Você não tem permissão para alterar o status desta fila.",
+      });
+    }
+
+    // Atualizar o status
+    queue.status = status;
+    await queue.save();
+
+    res.status(200).json({
+      message: "Status da fila atualizado com sucesso.",
+      queue,
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar o status da fila:", error);
+    res
+      .status(500)
+      .json({ message: "Erro ao atualizar o status da fila.", error });
   }
 };

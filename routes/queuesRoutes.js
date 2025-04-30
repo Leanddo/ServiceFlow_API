@@ -5,9 +5,9 @@ const { requireAuth } = require("../middleware/authMiddleware");
 
 // Inscrever um cliente em um serviço sem conta
 router.post(
-  "/services/:service_id/queues/no-account",
+  "/services/:service_id/queues/owner",
   requireAuth,
-  queuesController.addToQueueWithoutAccount
+  queuesController.addToQueueOwner
 );
 
 // Inscrever um cliente em um serviço
@@ -17,11 +17,18 @@ router.post(
   queuesController.addToQueue
 );
 
+// Atualizar o status de uma fila
+router.patch(
+  "/queues/:queue_id/status",
+  requireAuth, // Middleware para autenticação
+  queuesController.updateQueueStatus
+);
+
 // Listar a fila de um serviço
 router.get(
-  "/services/:service_id/queues",
+  "/queues",
   requireAuth,
-  queuesController.getQueueByService
+  queuesController.getQueues
 );
 
 // Cancelar inscrição de um cliente
@@ -38,6 +45,6 @@ router.get(
   queuesController.getAvailableTimes
 );
 
-router.get("/client/queues", requireAuth, queuesController.getQueueByClient);
+
 
 module.exports = router;

@@ -47,6 +47,19 @@ exports.signUp = async (req, res) => {
       await professional.update({ user_id: createdUser.user_id });
     }
 
+    // Verificar se existem filas associadas ao e-mail
+    const existingQueues = await Queues.findAll({
+      where: { client_email: email, user_id: null },
+    });
+
+    if (existingQueues.length > 0) {
+      // Associar o user_id às filas onde o e-mail está registrado
+      await Queues.update(
+        { user_id: createdUser.user_id },
+        { where: { client_email: email, user_id: null } }
+      );
+    }
+    
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     const hashedOtp = await bcrypt.hash(otp, 10);

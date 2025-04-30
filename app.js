@@ -15,6 +15,7 @@ const professionalsRouter = require("./routes/professionalsRoutes");
 const businessPhotosRoutes = require("./routes/businessPhotosRoutes.js");
 const servicesRoutes = require("./routes/servicesRoutes");
 const queuesRoutes = require("./routes/queuesRoutes");
+const reviewsRoutes = require("./routes/reviewsRoutes.js");
 
 const scheduleNotificationAppointment = require("./notifications/notificationsApoitment");
 const limiter = require("./utils/requestsLimiter.js");
@@ -53,6 +54,7 @@ app.use("/api", [
   businessPhotosRoutes,
   servicesRoutes,
   queuesRoutes,
+  reviewsRoutes
 ]);
 
 scheduleNotificationAppointment();

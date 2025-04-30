@@ -56,6 +56,11 @@ const Queues = db.define("Queues", {
   client_email: {
     type: Sequelize.STRING,
   },
+  status:{
+    type: Sequelize.ENUM("waiting", "in_progress", "completed", "canceled"),
+    allowNull: false,
+    defaultValue: "waiting",
+  }
 });
 
 module.exports = { Queues };

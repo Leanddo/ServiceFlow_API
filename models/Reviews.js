@@ -35,6 +35,10 @@ const Reviews = db.define("Reviews", {
       key: "user_id",
     },
   },
+  createdAt:{
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW,
+  }
 });
 
 

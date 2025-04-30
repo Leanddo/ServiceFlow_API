@@ -1,6 +1,6 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const { User, Professionals } = require("../models/index");
+const { User, Professionals, Queues } = require("../models/index");
 const { generateToken } = require("../utils/jwtUtils");
 require("dotenv").config();
 
@@ -18,7 +18,9 @@ passport.use(
 
         if (!user) {
           // Verificar se o e-mail já está associado a outro usuário
-          user = await User.findOne({ where: { email: profile.emails[0].value } });
+          user = await User.findOne({
+            where: { email: profile.emails[0].value },
+          });
 
           if (!user) {
             // Verificar se o e-mail corresponde a um profissional existente
@@ -50,6 +52,18 @@ passport.use(
           username: user.username || profile.displayName,
           fotoUrl: profile.photos[0].value,
         });
+
+        // Associar o user_id às filas onde o e-mail está registrado
+        const existingQueues = await Queues.findAll({
+          where: { client_email: user.email, user_id: null },
+        });
+
+        if (existingQueues.length > 0) {
+          await Queues.update(
+            { user_id: user.user_id },
+            { where: { client_email: user.email, user_id: null } }
+          );
+        }
 
         // Gerar o token de autenticação
         const token = await generateToken(user);

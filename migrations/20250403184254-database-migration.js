@@ -269,6 +269,10 @@ module.exports = {
           key: "user_id",
         },
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW,
+      },
     });
 
     await queryInterface.createTable("Notifications", {
@@ -352,6 +356,11 @@ module.exports = {
       },
       client_email: {
         type: Sequelize.STRING,
+      },
+      status: {
+        type: Sequelize.ENUM("waiting", "in_progress", "completed", "canceled"),
+        allowNull: false,
+        defaultValue: "waiting",
       },
     });
 
