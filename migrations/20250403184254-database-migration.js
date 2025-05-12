@@ -386,17 +386,54 @@ module.exports = {
         allowNull: false,
       },
     });
+
+    await queryInterface.createTable("PasswordResetToken", {
+      token_id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      user_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Users", 
+          key: "user_id", 
+        },
+        onDelete: "CASCADE",
+      },
+      token: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      expires_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+    });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("OTP"); // depende de Users
+/*     await queryInterface.dropTable("OTP"); // depende de Users
     await queryInterface.dropTable("Queues"); // depende de Users, Businesses, Services
     await queryInterface.dropTable("Notifications"); // depende de Users
-    await queryInterface.dropTable("Reviews"); // depende de Users, Services */
+    await queryInterface.dropTable("Reviews"); // depende de Users, Services 
     await queryInterface.dropTable("Professionals"); // depende de Users, Businesses
     await queryInterface.dropTable("Services");
     await queryInterface.dropTable("BusinessPhotos"); // depende de nada// depende de Businesses
     await queryInterface.dropTable("Businesses"); // depende de nada
-    await queryInterface.dropTable("Users"); // é base para várias */
+    await queryInterface.dropTable("Users"); // é base para várias  */
+    await queryInterface.dropTable("PasswordResetToken");
+
   },
 };

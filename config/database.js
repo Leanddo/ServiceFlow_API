@@ -9,10 +9,10 @@ module.exports = new sequelize(process.env.PGDATABASE, process.env.PGUSER, proce
     timestamps: false,
     freezeTableName: true,
   },
-  dialectOptions: {
+ /*  dialectOptions: {
     ssl: {
       require: true,
       rejectUnauthorized: false 
     }
-  }
+  } */
 });

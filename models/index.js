@@ -10,6 +10,7 @@ const { BusinessesPhotos } = require("./BusinessesPhotos");
 const { Professionals } = require("./Professionals");
 const { OTP } = require("./OTP");
 const { Notifications } = require("./Notifications");
+const { PasswordResetToken } = require("./PasswordResetToken");
 
 // Relacionamentos
 
@@ -66,6 +67,16 @@ Professionals.hasMany(Queues, {
   onDelete: "CASCADE",
 });
 
+// Relacionamento entre PasswordResetToken e Users
+PasswordResetToken.belongsTo(User, {
+  foreignKey: "user_id",
+  onDelete: "CASCADE",
+});
+User.hasMany(PasswordResetToken, {
+  foreignKey: "user_id",
+  onDelete: "CASCADE",
+});
+
 // Exportar todos os modelos
 module.exports = {
   db,
@@ -78,4 +89,5 @@ module.exports = {
   OTP,
   Notifications,
   BusinessesPhotos,
+  PasswordResetToken,
 };
