@@ -31,13 +31,7 @@ db.authenticate()
 
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
-    credentials: true,
-    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
-  })
-);
+app.use(cors());
 
 app.use(express.json());
 
