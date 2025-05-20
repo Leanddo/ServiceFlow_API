@@ -1,9 +1,10 @@
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-const { User, PasswordResetToken } = require("../models");
-const sendEmail = require("../utils/emailSender"); // Função para envio de e-mails
+const { User, PasswordResetToken } = require("../../models");
+const sendEmail = require("../../utils/emailSender"); // Função para envio de e-mails
 const path = require("path");
 const { Op } = require("sequelize");
+require("dotenv").config();
 
 exports.forgotPassword = async (req, res) => {
   try {
@@ -28,7 +29,7 @@ exports.forgotPassword = async (req, res) => {
     });
 
     // Enviar o e-mail com o link de redefinição
-    const resetLink = `http://localhost:3000/reset-password/${token}`;
+    const resetLink = `${process.env.HOST}/auth/verify-password/${token}`;
     const placeholders = {
       USERNAME: user.username,
       RESET_LINK: resetLink,
@@ -37,7 +38,7 @@ exports.forgotPassword = async (req, res) => {
     await sendEmail({
       to: email,
       subject: "Redefinição de Senha",
-      templatePath: path.join(__dirname, "../templates/resetPasswordTemplate.html"),
+      templatePath: path.join(__dirname, "../../templates/resetPasswordTemplate.html"),
       placeholders,
     });
 

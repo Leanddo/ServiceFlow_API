@@ -11,7 +11,7 @@ const {
   OTP,
 } = require("../models/index");
 
-const { httpCode } = require("../utils/httpCodeHandler");
+require("dotenv").config();
 
 exports.getProfile = async (req, res) => {
   try {
@@ -64,7 +64,7 @@ exports.updateProfile = async (req, res) => {
 
     // Se há foto, atualiza o campo 'fotoUrl'
     if (req.file) {
-      user.fotoUrl = `/userImg/${req.file.filename}`;
+      user.fotoUrl = `${process.env.HOST}/userImg/${req.file.filename}`;
     }
 
     await user.save();

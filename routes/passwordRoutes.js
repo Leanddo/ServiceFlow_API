@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const passwordController = require("../controller/passwordController");
+const passwordController = require("../controller/authController/passwordController");
 
 // Solicitar redefinição de senha
 router.post("/forgot-password", passwordController.forgotPassword);

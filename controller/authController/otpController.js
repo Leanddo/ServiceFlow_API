@@ -95,9 +95,10 @@ exports.resendOTP = async (req, res) => {
       placeholders,
     });
 
-    return httpCode(404, { message: "Novo código enviado para o email." }, res);
+    return httpCode(200, { message: "Novo código enviado para o email." }, res);
   } catch (error) {
     console.error("Erro ao reenviar OTP:", error);
     return httpCode(500, { message: "Erro ao reenviar o código." }, res);
   }
 };
+

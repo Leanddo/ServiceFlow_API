@@ -1,9 +1,8 @@
-const { User, OTP, Professionals } = require("../../models/index");
+const { User, OTP, Professionals, Queues } = require("../../models/index");
 
 const bcrypt = require("bcrypt");
 const path = require("path");
 
-const { httpCode } = require("../../utils/httpCodeHandler");
 const { generateToken } = require("../../utils/jwtUtils");
 const sendEmail = require("../../utils/emailSender");
 
@@ -11,22 +10,20 @@ require("dotenv").config();
 
 exports.signUp = async (req, res) => {
   const { username, email, password } = req.body;
+
+  if (!username || !email || !password) {
+    return res.status(401).json({ error: "All fields are required" });
+  }
+
   try {
     const existingUser = await User.findOne({ where: { email } });
-    if (!username || !email || !password) {
-      return httpCode(401, { error: "All fields are required" }, res);
-    }
 
     if (existingUser) {
-      return httpCode(400, { error: "This email is already taken" }, res);
+      return res.status(400).json({ error: "This email is already taken" });
     }
 
     if (password.length < 6) {
-      return httpCode(
-        400,
-        { error: "Password must be at least 6 characters" },
-        res
-      );
+      return res.status(400).json({ error: "Password must be at least 6 characters" });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -59,7 +56,8 @@ exports.signUp = async (req, res) => {
         { where: { client_email: email, user_id: null } }
       );
     }
-    
+
+    // Criar e guardar OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     const hashedOtp = await bcrypt.hash(otp, 10);
@@ -70,6 +68,7 @@ exports.signUp = async (req, res) => {
       otpExpires: expiresAt,
     });
 
+    // Enviar email com OTP
     const placeholders = {
       USERNAME: username,
       OTP: otp,
@@ -82,6 +81,7 @@ exports.signUp = async (req, res) => {
       placeholders,
     });
 
+    // Gerar token e definir cookie
     const token = await generateToken(createdUser);
 
     res.cookie("authcookie", token, {
@@ -90,10 +90,10 @@ exports.signUp = async (req, res) => {
       sameSite: "None",
     });
 
-    return httpCode(201, { username, email }, res);
+    return res.status(201).json({ username, email });
   } catch (error) {
     console.log(error);
-    return httpCode(500, { error: "Internal server error" }, res);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -101,37 +101,50 @@ exports.login = async (req, res) => {
   const { password, email } = req.body;
 
   if (!password || !email) {
-    httpCode(400, { error: "incorrect username or email" }, res);
+    return res.status(400).json({ error: "incorrect username or email" });
   }
 
   try {
-    const user = await User.findOne({
-      where: {
-        email: email,
-      },
-    });
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return httpCode(400, { error: "Email ou senha incorretos" }, res);
+      return res.status(400).json({ error: "Email ou senha incorretos" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (isPasswordValid) {
-      const token = await generateToken(user);
-
-      res.cookie("authcookie", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-      });
-
-      httpCode(200, { success: true }, res);
-    } else {
-      httpCode(401, { message: "Incorrect password or email" }, res);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Incorrect password or email" });
     }
+
+    const token = await generateToken(user);
+
+    res.cookie("authcookie", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+
+    if (!user.is_verified) {
+      return res.status(403).json({ error: "Conta não verificada. Por favor, confirma o teu email." });
+    }
+
+    return res.status(200).json({ success: true });
+
   } catch (error) {
     console.log(error);
-    httpCode(500, { error: "Internal server error" }, res);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+exports.logout = async (req, res) => {
+  res.clearCookie('authcookie', {
+    httpOnly: true,
+    secure: true,   // se usas HTTPS
+    sameSite: 'Strict',
+    path: '/',      // tem de ser o mesmo path do cookie original
+  });
+
+  res.status(200).send({ message: 'Logout successful' });
+}

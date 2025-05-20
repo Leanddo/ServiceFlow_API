@@ -31,7 +31,11 @@ db.authenticate()
 
 app.use(cookieParser());
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:4200',  // só permite este domínio
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true  // permite cookies, autenticação etc.
+}));
 
 app.use(express.json());
 
