@@ -60,7 +60,11 @@ const Businesses = db.define("Businesses", {
       "Fast Food Restaurant",
       "Car Repair Shop",
       "Consultancy",
-      "Design Services"
+      "Design Services",
+      "Tattoo Studio",
+      "Massage Therapy",
+      "Nail Salon",
+      "Travel Agency",
     ),
     allowNull: false,
   },

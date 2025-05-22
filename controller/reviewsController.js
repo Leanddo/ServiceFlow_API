@@ -154,7 +154,7 @@ exports.businessAverageRating = async (req, res) => {
 
     res.status(200).json({
       business_name: business.business_name,
-      average_rating: parseFloat(average_rating).toFixed(2), // Média geral arredondada
+      average_rating: average_rating ? parseFloat(average_rating).toFixed(2) : "0.00",
       total_reviews: parseInt(total_reviews, 10), // Total de avaliações
     });
   } catch (error) {

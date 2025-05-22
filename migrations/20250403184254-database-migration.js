@@ -104,7 +104,11 @@ module.exports = {
           "Fast Food Restaurant",
           "Car Repair Shop",
           "Consultancy",
-          "Design Services"
+          "Design Services",
+          "Tattoo Studio",
+          "Massage Therapy",
+          "Nail Salon",
+          "Travel Agency",
         ),
         allowNull: false,
       },
@@ -397,8 +401,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Users", 
-          key: "user_id", 
+          model: "Users",
+          key: "user_id",
         },
         onDelete: "CASCADE",
       },
@@ -424,15 +428,15 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-/*     await queryInterface.dropTable("OTP"); // depende de Users
-    await queryInterface.dropTable("Queues"); // depende de Users, Businesses, Services
-    await queryInterface.dropTable("Notifications"); // depende de Users
-    await queryInterface.dropTable("Reviews"); // depende de Users, Services 
-    await queryInterface.dropTable("Professionals"); // depende de Users, Businesses
-    await queryInterface.dropTable("Services");
-    await queryInterface.dropTable("BusinessPhotos"); // depende de nada// depende de Businesses
-    await queryInterface.dropTable("Businesses"); // depende de nada
-    await queryInterface.dropTable("Users"); // é base para várias  */
+    /*     await queryInterface.dropTable("OTP"); // depende de Users
+        await queryInterface.dropTable("Queues"); // depende de Users, Businesses, Services
+        await queryInterface.dropTable("Notifications"); // depende de Users
+        await queryInterface.dropTable("Reviews"); // depende de Users, Services 
+        await queryInterface.dropTable("Professionals"); // depende de Users, Businesses
+        await queryInterface.dropTable("Services");
+        await queryInterface.dropTable("BusinessPhotos"); // depende de nada// depende de Businesses
+        await queryInterface.dropTable("Businesses"); // depende de nada
+        await queryInterface.dropTable("Users"); // é base para várias  */
     await queryInterface.dropTable("PasswordResetToken");
 
   },

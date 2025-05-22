@@ -1,4 +1,5 @@
 const { Businesses, BusinessesPhotos } = require("../models/index");
+require("dotenv").config();
 
 exports.getBusinessPhotos = async (req, res) => {
   try {
@@ -41,7 +42,7 @@ exports.addBusinessPhotos = async (req, res) => {
       req.files.map((file) =>
         BusinessesPhotos.create({
           business_id,
-          photo_url: `/public/business/${file.filename}`,
+          photo_url: `${process.env.API_HOST}/public/business/${file.filename}`,
           description,
         })
       )

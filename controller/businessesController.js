@@ -3,6 +3,8 @@ const { Op } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
+require("dotenv").config();
+
 exports.createBusiness = async (req, res) => {
   const {
     business_name,
@@ -215,7 +217,7 @@ exports.updateBusinessPhoto = async (req, res) => {
       const oldImagePath = path.join(
         __dirname,
         "..",
-        "public/businessImg",
+        "public/business",
         path.basename(business.main_photo_url)
       );
 
@@ -228,7 +230,7 @@ exports.updateBusinessPhoto = async (req, res) => {
 
     // Atualiza com nova imagem
     if (req.file) {
-      business.main_photo_url = `/businessImg/${req.file.filename}`;
+      business.main_photo_url = `${process.env.API_HOST}/business/${req.file.filename}`;
       await business.save();
     }
 

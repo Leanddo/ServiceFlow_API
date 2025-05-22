@@ -23,7 +23,7 @@ const limiter = require("./utils/requestsLimiter.js");
 
 const app = express();
 
-app.use(limiter);
+/* app.use(limiter);*/
 
 db.authenticate()
   .then(() => console.log("database connected"))
@@ -41,7 +41,7 @@ app.use(express.json());
 
 app.use(passport.initialize());
 
-app.use("/userImg", express.static("public/userImg"));
+app.use("/", express.static("public/"));
 
 app.use("/api", [
   authRoutes,
