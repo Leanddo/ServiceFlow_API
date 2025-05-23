@@ -21,7 +21,7 @@ exports.getAllProfessionals = async (req, res) => {
 };
 
 // Obter um profissional por ID
-exports.getProfessionalsByBusinessId = async (req, res) => {
+exports.getPrivateProfessionalsByBusinessId = async (req, res) => {
   try {
     const { business_id } = req.params;
 
@@ -49,6 +49,38 @@ exports.getProfessionalsByBusinessId = async (req, res) => {
     res.status(200).json(professionals);
   } catch (error) {
     console.error("Erro ao buscar profissionais por business_id:", error);
+    res.status(500).json({ message: "Erro ao buscar profissionais", error });
+  }
+};
+
+exports.getPublicProfessionalsByBusinessId = async (req, res) => {
+  try {
+    const { business_id } = req.params;
+
+    // Validar se o business_id é um número
+    if (isNaN(business_id)) {
+      return res
+        .status(400)
+        .json({ message: "O ID do negócio fornecido é inválido." });
+    }
+
+    const professionals = await Professionals.findAll({
+      where: { business_id, isActive: true }, 
+      attributes: ["role", "availability"], 
+      include: [
+        { model: User, attributes: ["username", "fotoUrl"] },
+      ],
+    });
+
+    if (professionals.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Nenhum profissional encontrado para este negócio." });
+    }
+
+    res.status(200).json(professionals);
+  } catch (error) {
+    console.error("Erro ao buscar profissionais públicos por business_id:", error);
     res.status(500).json({ message: "Erro ao buscar profissionais", error });
   }
 };

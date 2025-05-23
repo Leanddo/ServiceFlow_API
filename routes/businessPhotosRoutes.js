@@ -6,12 +6,12 @@ const { requireAuth } = require("../middleware/authMiddleware");
 const isOwnerOrManager = require("../middleware/isOwnerOrManagerMiddleware");
 
 router.get(
-  "/businesses/:business_id/photos",
+  "/business/:business_id/photos",
   businessPhotosController.getBusinessPhotos
 );
 // Adicionar uma nova foto a um negócio
 router.post(
-  "/businesses/:business_id/photos",
+  "/business/:business_id/photos",
   requireAuth,
   isOwnerOrManager,
   createUploadMiddleware("business", false),
@@ -19,7 +19,7 @@ router.post(
 );
 
 router.delete(
-  "/businesses/:business_id/photos/:photo_id",
+  "/business/:business_id/photos/:photo_id",
   requireAuth,
   isOwnerOrManager,
   businessPhotosController.deleteBusinessPhoto

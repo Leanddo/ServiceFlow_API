@@ -11,16 +11,22 @@ Router.get(
   professionalsController.getAllProfessionals
 );
 
-// Obter todos os profissionais de um negócio
+// Obter todos os profissionais de um negócio privado
 Router.get(
-  "/businesses/:business_id/professionals",
+  "/business/:business_id/professionals/private",
   requireAuth,
-  professionalsController.getProfessionalsByBusinessId
+  professionalsController.getPrivateProfessionalsByBusinessId
+);
+
+// Obter todos os profissionais de um negócio publico
+Router.get(
+  "/business/:business_id/professionals/public",
+  professionalsController.getPublicProfessionalsByBusinessId
 );
 
 // Criar um novo profissional para um negócio
 Router.post(
-  "/businesses/:business_id/professionals",
+  "/business/:business_id/professionals",
   requireAuth,
   isOwnerOrManager,
   professionalsController.createProfessional

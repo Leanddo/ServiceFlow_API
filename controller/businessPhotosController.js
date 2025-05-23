@@ -42,7 +42,7 @@ exports.addBusinessPhotos = async (req, res) => {
       req.files.map((file) =>
         BusinessesPhotos.create({
           business_id,
-          photo_url: `${process.env.API_HOST}/public/business/${file.filename}`,
+          photo_url: `${process.env.API_HOST}/business/${file.filename}`,
           description,
         })
       )
