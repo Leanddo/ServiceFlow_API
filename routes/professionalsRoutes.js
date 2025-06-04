@@ -39,7 +39,7 @@ Router.put(
   isOwnerOrManager,
   professionalsController.updateProfessional
 );
-
+  
 // Deletar um profissional
 Router.delete(
   "/professionals/:id",

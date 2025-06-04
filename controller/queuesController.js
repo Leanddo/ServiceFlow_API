@@ -524,6 +524,69 @@ exports.addToQueueOwner = async (req, res) => {
   }
 };
 
+exports.getUserQueues = async (req, res) => {
+  try {
+    const user_id = req.user.user_id; // ID do usuário autenticado
+
+    // Buscar as filas onde o usuário é cliente ou profissional
+    const queues = await Queues.findAll({
+      where: {
+        [Op.or]: [
+          { user_id }, // Fila onde o usuário é cliente
+          { "$Professional.user_id$": user_id }, // Fila onde o usuário é profissional
+        ],
+      },
+      include: [
+        {
+          model: Services,
+          attributes: ["service_name"], // Nome do serviço
+        },
+        {
+          model: Businesses,
+          attributes: ["business_name", "business_address"], // Informações do negócio
+        },
+        {
+          model: Professionals,
+          attributes: ["professional_id", "user_id"], // Informações do profissional
+        },
+      ],
+      attributes: [
+        "queue_id",
+        "queue_position",
+        "queue_estimate_wait_time",
+        "queue_date",
+        "status",
+        "user_id", // ID do cliente, se existir
+      ],
+      order: [["queue_date", "ASC"]], // Ordenar por data
+    });
+
+    if (queues.length === 0) {
+      return res.status(404).json({
+        message: "Nenhuma fila encontrada para o usuário.",
+      });
+    }
+
+    // Formatar a resposta para incluir o nome e o e-mail corretos
+    const formattedQueues = queues.map((queue) => ({
+      queue_id: queue.queue_id,
+      queue_position: queue.queue_position,
+      queue_estimate_wait_time: queue.queue_estimate_wait_time,
+      queue_date: queue.queue_date,
+      status: queue.status,
+      service_name: queue.Service.service_name,
+      business_name: queue.Business.business_name,
+      business_address: queue.Business.business_address,
+      isProfessional: queue.Professional?.user_id === user_id, // Indica se o usuário é o profissional
+    }));
+
+    res.status(200).json(formattedQueues);
+  } catch (error) {
+    console.error("Erro ao buscar filas do usuário:", error);
+    res.status(500).json({ message: "Erro ao buscar filas do usuário.", error });
+  }
+};
+
 exports.getQueues = async (req, res) => {
   try {
     const { service_id, start_date, end_date } = req.query; // Filtros opcionais

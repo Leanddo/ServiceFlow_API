@@ -16,9 +16,15 @@ router.get(
   reviewsController.getServiceReviews
 );
 
+// Obter todas as avaliações de um negócio
+router.get(
+  "/business/:business_id/reviews",
+  reviewsController.getAllBusinessReviews
+);
+
 // Buscar a média de avaliações de todos os serviços
 router.get(
-  "/businesses/:business_id/average-rating",
+  "/business/:business_id/average-rating",
   reviewsController.businessAverageRating
 );
 

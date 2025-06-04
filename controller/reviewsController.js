@@ -55,6 +55,60 @@ exports.addReview = async (req, res) => {
   }
 };
 
+exports.getAllBusinessReviews = async (req, res) => {
+  try {
+    const { business_id } = req.params;
+
+    // Verificar se o negócio existe
+    const business = await Businesses.findByPk(business_id);
+    if (!business) {
+      return res.status(404).json({ message: "Negócio não encontrado." });
+    }
+
+    // Buscar todas as avaliações dos serviços do negócio
+    const reviews = await Reviews.findAll({
+      attributes: [
+        "review_id",
+        "review_title",
+        "review_body",
+        "review_rating",
+        "user_id",
+        "createdAt",
+      ],
+      include: [
+        {
+          model: Services,
+          attributes: ["service_id", "service_name"],
+          where: { business_id }, // Filtrar pelos serviços do negócio
+        },
+        {
+          model: User,
+          attributes: ["username", "fotoUrl"],
+        },
+      ],
+      order: [["createdAt", "DESC"]], // Ordenar pelas mais recentes
+    });
+
+    if (reviews.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Nenhuma avaliação encontrada para este negócio." });
+    }
+
+    res.status(200).json({
+      business_name: business.business_name,
+      total_reviews: reviews.length,
+      reviews,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar avaliações do negócio:", error);
+    res.status(500).json({
+      message: "Erro ao buscar avaliações do negócio.",
+      error,
+    });
+  }
+};
+
 exports.getServiceReviews = async (req, res) => {
   try {
     const { service_id } = req.params;

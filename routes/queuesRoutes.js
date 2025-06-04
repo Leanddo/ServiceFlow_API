@@ -20,7 +20,7 @@ router.post(
 // Atualizar o status de uma fila
 router.patch(
   "/queues/:queue_id/status",
-  requireAuth, // Middleware para autenticação
+  requireAuth, 
   queuesController.updateQueueStatus
 );
 
@@ -29,6 +29,13 @@ router.get(
   "/queues",
   requireAuth,
   queuesController.getQueues
+);
+
+// Listar a fila de um serviço
+router.get(
+  "/queues/user",
+  requireAuth,
+  queuesController.getUserQueues
 );
 
 // Cancelar inscrição de um cliente
@@ -41,7 +48,6 @@ router.delete(
 // Obter horários disponíveis para um serviço em uma data específica
 router.get(
   "/services/:service_id/queues/available-times/:date",
-  requireAuth,
   queuesController.getAvailableTimes
 );
 
