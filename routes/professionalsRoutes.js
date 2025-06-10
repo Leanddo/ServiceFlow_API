@@ -24,6 +24,13 @@ Router.get(
   professionalsController.getPublicProfessionalsByBusinessId
 );
 
+// Obter todos os profissionais de um negócio publico
+Router.get(
+  "/businesses/user",
+  requireAuth,
+  professionalsController.getAllBusinessesByUser
+);
+
 // Criar um novo profissional para um negócio
 Router.post(
   "/business/:business_id/professionals",
@@ -34,7 +41,7 @@ Router.post(
 
 // Atualizar um profissional existente
 Router.put(
-  "/professionals/:id",
+  "/business/:business_id/professionals/:id",
   requireAuth,
   isOwnerOrManager,
   professionalsController.updateProfessional

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Avalie o Serviço</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f7;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      background-color: white;
+      padding: 30px;
+      margin: 0 auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      color: #333;
+    }
+    h1 {
+      color: #4c0082;
+    }
+    a.button {
+      display: inline-block;
+      background-color: #4c0082;
+      color: white !important;
+      padding: 12px 20px;
+      margin-top: 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    a.button:hover {
+      background-color: #35005a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Olá, {{USERNAME}}!</h1>
+    <p>Obrigado por utilizar o nosso serviço.</p>
+    <p>
+      Gostaríamos de saber a sua opinião para melhorar cada vez mais.
+      Clique no botão abaixo para avaliar o serviço que acabou de utilizar:
+    </p>
+    <a href="{{SERVICE_REVIEW_LINK}}" class="button" target="_blank" rel="noopener noreferrer">
+      Avaliar Serviço
+    </a>
+    <p>Obrigado pelo seu tempo!</p>
+    <p>Equipe ServiceFlow</p>
+  </div>
+</body>
+</html>

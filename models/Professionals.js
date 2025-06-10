@@ -16,7 +16,7 @@ const Professionals = db.define("Professionals", {
     defaultValue: [], // Exemplo: ["Segunda - 09:00 - 17:00", "Terça - 10:00 - 18:00"]
   },
   role: {
-    type: Sequelize.ENUM("Owner", "Employee", "Assistant", "Other"),
+    type: Sequelize.ENUM("Owner", "Manager", "Employee", "Assistant", "Other"),
     allowNull: false,
     defaultValue: "Employee",
   },

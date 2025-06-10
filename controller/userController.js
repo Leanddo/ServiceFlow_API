@@ -6,7 +6,7 @@ const {
   User,
   Queues,
   Reviews,
-  Notification,
+  PasswordResetToken,
   Professionals,
   OTP,
 } = require("../models/index");
@@ -24,7 +24,7 @@ exports.getProfile = async (req, res) => {
       return res.status(404).json({ message: "Utilizador não encontrado" });
     }
 
-    return res.status(200).json({ profile: user });
+    return res.status(200).json(user);
   } catch (err) {
     console.error("Erro ao buscar perfil:", err);
     return res.status(500).json({ message: "Erro interno ao buscar perfil" });
@@ -64,7 +64,7 @@ exports.updateProfile = async (req, res) => {
 
     // Se há foto, atualiza o campo 'fotoUrl'
     if (req.file) {
-      user.fotoUrl = `${process.env.HOST}/userImg/${req.file.filename}`;
+      user.fotoUrl = `${process.env.API_HOST}/userImg/${req.file.filename}`;
     }
 
     await user.save();
@@ -135,17 +135,14 @@ exports.updatePassword = async (req, res) => {
 };
 
 exports.deleteAccount = async (req, res) => {
-  const { password } = req.body;
-
   try {
+    // Buscar o usuário autenticado pelo token
     const user = await User.findByPk(req.user.user_id);
-    if (!user)
+    if (!user) {
       return res.status(404).json({ message: "Utilizador não encontrado" });
+    }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(401).json({ message: "Palavra-passe incorreta" });
-
+    // Remover a imagem de perfil, se existir
     if (user.fotoUrl) {
       const imgPath = path.join(
         __dirname,
@@ -157,11 +154,14 @@ exports.deleteAccount = async (req, res) => {
       if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
     }
 
+    // Excluir dados relacionados ao usuário
     await Queues.destroy({ where: { user_id: user.user_id } });
     await Reviews.destroy({ where: { user_id: user.user_id } });
-    await Notification.destroy({ where: { user_id: user.user_id } });
+    await PasswordResetToken.destroy({ where: { user_id: user.user_id } });
     await Professionals.destroy({ where: { user_id: user.user_id } });
     await OTP.destroy({ where: { user_id: user.user_id } });
+
+    // Excluir o usuário
     await user.destroy();
 
     return res.status(200).json({ message: "Conta eliminada com sucesso" });

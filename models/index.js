@@ -36,6 +36,7 @@ Services.belongsTo(Businesses, {
 Professionals.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" });
 Professionals.belongsTo(Businesses, {
   foreignKey: "business_id",
+  as: "business",
   onDelete: "CASCADE",
 });
 

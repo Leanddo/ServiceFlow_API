@@ -26,16 +26,16 @@ router.patch(
 
 // Listar a fila de um serviço
 router.get(
-  "/queues",
+  "/queues/user",
   requireAuth,
-  queuesController.getQueues
+  queuesController.getUserQueues
 );
 
 // Listar a fila de um serviço
 router.get(
-  "/queues/user",
+  "/queues/:business_id",
   requireAuth,
-  queuesController.getUserQueues
+  queuesController.getQueues
 );
 
 // Cancelar inscrição de um cliente

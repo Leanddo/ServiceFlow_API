@@ -116,9 +116,8 @@ exports.addToQueue = async (req, res) => {
     // Criar a inscrição na fila
     const newQueue = await Queues.create({
       queue_position,
-      queue_estimate_wait_time: `${Math.floor(service.duration / 60)}:${
-        service.duration % 60
-      }:00`, // Formato HH:mm:ss
+      queue_estimate_wait_time: `${Math.floor(service.duration / 60)}:${service.duration % 60
+        }:00`, // Formato HH:mm:ss
       queue_date,
       user_id: req.user.user_id,
       service_id,
@@ -174,7 +173,7 @@ exports.addToQueue = async (req, res) => {
         BUSINESS_NAME: business.business_name,
         SERVICE_NAME: service.service_name,
         QUEUE_DATE: new Date(queue_date).toLocaleString(),
-        DELETE_LINK: `https://serviceflow.me/queues/${newQueue.queue_id}/delete`,
+        DELETE_LINK: `${process.env.HOST}/user/account/appointments`,
       };
 
       await sendEmail({
@@ -429,9 +428,8 @@ exports.addToQueueOwner = async (req, res) => {
     // Criar a inscrição na fila
     const newQueue = await Queues.create({
       queue_position,
-      queue_estimate_wait_time: `${Math.floor(service.duration / 60)}:${
-        service.duration % 60
-      }:00`, // Formato HH:mm:ss
+      queue_estimate_wait_time: `${Math.floor(service.duration / 60)}:${service.duration % 60
+        }:00`, // Formato HH:mm:ss
       queue_date,
       client_name, // Nome do cliente
       client_email, // E-mail do cliente
@@ -526,28 +524,23 @@ exports.addToQueueOwner = async (req, res) => {
 
 exports.getUserQueues = async (req, res) => {
   try {
-    const user_id = req.user.user_id; // ID do usuário autenticado
+    const user_id = req.user.user_id; 
 
-    // Buscar as filas onde o usuário é cliente ou profissional
     const queues = await Queues.findAll({
-      where: {
-        [Op.or]: [
-          { user_id }, // Fila onde o usuário é cliente
-          { "$Professional.user_id$": user_id }, // Fila onde o usuário é profissional
-        ],
-      },
+      where:
+        { user_id },
       include: [
         {
           model: Services,
-          attributes: ["service_name"], // Nome do serviço
+          attributes: ["service_name"], 
         },
         {
           model: Businesses,
-          attributes: ["business_name", "business_address"], // Informações do negócio
+          attributes: ["business_name", "business_address"], 
         },
         {
           model: Professionals,
-          attributes: ["professional_id", "user_id"], // Informações do profissional
+          attributes: ["professional_id", "user_id"], 
         },
       ],
       attributes: [
@@ -556,9 +549,9 @@ exports.getUserQueues = async (req, res) => {
         "queue_estimate_wait_time",
         "queue_date",
         "status",
-        "user_id", // ID do cliente, se existir
+        "user_id", 
       ],
-      order: [["queue_date", "ASC"]], // Ordenar por data
+      order: [["queue_date", "ASC"]], 
     });
 
     if (queues.length === 0) {
@@ -567,7 +560,6 @@ exports.getUserQueues = async (req, res) => {
       });
     }
 
-    // Formatar a resposta para incluir o nome e o e-mail corretos
     const formattedQueues = queues.map((queue) => ({
       queue_id: queue.queue_id,
       queue_position: queue.queue_position,
@@ -577,7 +569,7 @@ exports.getUserQueues = async (req, res) => {
       service_name: queue.Service.service_name,
       business_name: queue.Business.business_name,
       business_address: queue.Business.business_address,
-      isProfessional: queue.Professional?.user_id === user_id, // Indica se o usuário é o profissional
+      isProfessional: queue.Professional?.user_id === user_id, 
     }));
 
     res.status(200).json(formattedQueues);
@@ -589,33 +581,44 @@ exports.getUserQueues = async (req, res) => {
 
 exports.getQueues = async (req, res) => {
   try {
-    const { service_id, start_date, end_date } = req.query; // Filtros opcionais
+    const { service_id, start_date, end_date } = req.query; // filtros opcionais
+    const { business_id } = req.params; // business_id da rota
 
     // Buscar o profissional associado ao usuário autenticado
     const professional = await Professionals.findOne({
-      where: { user_id: req.user.user_id },
+      where: {
+        user_id: req.user.user_id,
+        business_id
+      },
     });
 
     if (!professional) {
       return res.status(404).json({ message: "Profissional não encontrado." });
     }
 
-    // Verificar se o profissional faz parte de um negócio válido
-    const business = await Businesses.findByPk(professional.business_id);
+    // Verificar se o business_id da rota existe
+    const business = await Businesses.findByPk(business_id);
     if (!business) {
-      return res
-        .status(404)
-        .json({ message: "Negócio associado não encontrado." });
+      return res.status(404).json({ message: "Negócio não encontrado." });
     }
 
-    // Construir os filtros dinamicamente
-    const filters = {};
+    // Verificar se o profissional pertence ao negócio (business_id)
+    if (professional.business_id !== Number(business_id)) {
+      console.log("business_id da rota:", business_id, typeof business_id);
+      console.log("business_id do profissional:", professional.business_id, typeof professional.business_id);
+      return res
+        .status(403)
+        .json({ message: "Profissional não autorizado para este negócio." });
+    }
 
-    // Se o usuário for Owner ou Manager, ele verá todas as filas do negócio
-    if (["Owner", "Manager"].includes(professional.role)) {
-      filters.business_id = professional.business_id;
-    } else {
-      // Caso contrário, ele verá apenas as filas que ele irá atender
+    // Construir filtros
+    const filters = {
+      business_id: business_id, // obrigatório usar business_id da rota
+    };
+
+    // Se o usuário for Owner ou Manager, verá todas filas do negócio
+    // Senão, só verá filas dele mesmo
+    if (!["Owner", "Manager"].includes(professional.role)) {
       filters.professional_id = professional.professional_id;
     }
 
@@ -629,21 +632,21 @@ exports.getQueues = async (req, res) => {
       };
     }
 
-    // Buscar as filas com os filtros aplicados
+    // Buscar as filas com filtros
     const queues = await Queues.findAll({
       where: filters,
       include: [
         {
           model: Services,
-          attributes: ["service_name"], // Nome do serviço
+          attributes: ["service_name"],
         },
         {
           model: Businesses,
-          attributes: ["business_name", "business_address"], // Informações do negócio
+          attributes: ["business_name", "business_address"],
         },
         {
           model: User,
-          attributes: ["username", "email"], // Nome e e-mail do usuário, se existir
+          attributes: ["username", "email"],
         },
       ],
       attributes: [
@@ -652,11 +655,11 @@ exports.getQueues = async (req, res) => {
         "queue_estimate_wait_time",
         "queue_date",
         "status",
-        "client_name", // Nome do cliente, se não houver user_id
-        "client_email", // E-mail do cliente, se não houver user_id
-        "user_id", // ID do usuário, se existir
+        "client_name",
+        "client_email",
+        "user_id",
       ],
-      order: [["queue_date", "ASC"]], // Ordenar por data
+      order: [["queue_date", "ASC"]],
     });
 
     if (queues.length === 0) {
@@ -665,7 +668,7 @@ exports.getQueues = async (req, res) => {
       });
     }
 
-    // Formatar a resposta para incluir o nome e o e-mail corretos
+    // Formatar resposta
     const formattedQueues = queues.map((queue) => ({
       queue_id: queue.queue_id,
       queue_position: queue.queue_position,
@@ -691,19 +694,16 @@ exports.updateQueueStatus = async (req, res) => {
     const { queue_id } = req.params;
     const { status } = req.body;
 
-    // Validar o status fornecido
-    const validStatuses = ["waiting", "in_progress", "completed", "canceled"];
+    const validStatuses = ["waiting", "in_progress", "completed", "cancelled"];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: "Status inválido." });
     }
 
-    // Buscar a fila pelo ID
     const queue = await Queues.findByPk(queue_id);
     if (!queue) {
       return res.status(404).json({ message: "Fila não encontrada." });
     }
 
-    // Verificar se o usuário é o cliente ou o profissional associado
     const isClient = queue.user_id === req.user.user_id;
     const isProfessional = await Professionals.findOne({
       where: {
@@ -713,24 +713,48 @@ exports.updateQueueStatus = async (req, res) => {
     });
 
     if (isClient) {
-      // Clientes só podem alterar o status para "canceled"
-      if (status !== "canceled") {
+      if (status !== "cancelled") {
         return res.status(403).json({
-          message: "Clientes só podem alterar o status para 'canceled'.",
+          message: "Clientes só podem alterar o status para 'cancelled'.",
         });
       }
-    } else if (isProfessional) {
-      // Profissionais podem alterar o status para qualquer valor válido
-    } else {
-      // Caso contrário, o usuário não tem permissão
+    } else if (!isProfessional) {
       return res.status(403).json({
         message: "Você não tem permissão para alterar o status desta fila.",
       });
     }
 
-    // Atualizar o status
     queue.status = status;
     await queue.save();
+
+    // Se status for "completed", enviar email para avaliar
+    if (status === "completed") {
+      // Buscar utilizador para pegar email e username
+      const user = await User.findByPk(queue.user_id);
+      if (user) {
+        const placeholders = {
+          USERNAME: user.username,
+          SERVICE_REVIEW_LINK: `${process.env.HOST}/review/${queue.service_id}`,
+        };
+
+        const templatePath = path.join(
+          __dirname,
+          "../templates/reviewTemplate.html"
+        );
+
+        try {
+          await sendEmail({
+            to: user.email,
+            subject: "Avalie o serviço que acabou de utilizar",
+            templatePath,
+            placeholders,
+          });
+        } catch (emailError) {
+          console.error("Erro ao enviar email de avaliação:", emailError);
+          // Não bloqueia a resposta, só regista o erro
+        }
+      }
+    }
 
     res.status(200).json({
       message: "Status da fila atualizado com sucesso.",
@@ -738,8 +762,6 @@ exports.updateQueueStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("Erro ao atualizar o status da fila:", error);
-    res
-      .status(500)
-      .json({ message: "Erro ao atualizar o status da fila.", error });
+    res.status(500).json({ message: "Erro ao atualizar o status da fila.", error });
   }
 };

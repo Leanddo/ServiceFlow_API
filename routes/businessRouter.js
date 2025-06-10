@@ -11,6 +11,13 @@ const isOwnerOrManager = require("../middleware/isOwnerOrManagerMiddleware");
 Router.get("/business/", businessController.getAllBusinesses);
 Router.get("/business/:id", businessController.getBusinessById);
 
+// Verificar se o usuário é o proprietário do negócio
+Router.get(
+  "/business/:business_id/is-owner",
+  requireAuth,
+  businessController.isBusinessOwner
+);
+
 // Rotas protegidas
 Router.post(
   "/business/",

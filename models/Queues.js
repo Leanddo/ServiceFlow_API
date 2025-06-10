@@ -57,7 +57,7 @@ const Queues = db.define("Queues", {
     type: Sequelize.STRING,
   },
   status:{
-    type: Sequelize.ENUM("waiting", "in_progress", "completed", "canceled"),
+    type: Sequelize.ENUM("waiting", "in_progress", "completed", "cancelled"),
     allowNull: false,
     defaultValue: "waiting",
   }

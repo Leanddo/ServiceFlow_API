@@ -50,7 +50,6 @@ passport.use(
         // Atualizar informações do utilizador, se necessário
         await user.update({
           username: user.username || profile.displayName,
-          fotoUrl: profile.photos[0].value,
         });
 
         // Associar o user_id às filas onde o e-mail está registrado

@@ -39,7 +39,7 @@ const createUploadMiddleware = (folder, single = true) => {
   const upload = multer({
     storage: storage(folder), // Configuração de armazenamento
     fileFilter, // Filtro de tipos de arquivos
-    limits: { fileSize: 2 * 1024 * 1024 }, // Limite de tamanho do arquivo (2 MB)
+    limits: { fileSize: 20 * 1024 * 1024 }, // Limite de tamanho do arquivo (20 MB)
   });
 
   // Retorna o middleware de upload

@@ -35,7 +35,7 @@ exports.getPrivateProfessionalsByBusinessId = async (req, res) => {
     const professionals = await Professionals.findAll({
       where: { business_id },
       include: [
-        { model: Businesses, attributes: ["business_name"] },
+        { model: Businesses, as: 'business', attributes: ["business_name"] },
         { model: User, attributes: ["username", "email", "fotoUrl"] },
       ],
     });
@@ -65,8 +65,8 @@ exports.getPublicProfessionalsByBusinessId = async (req, res) => {
     }
 
     const professionals = await Professionals.findAll({
-      where: { business_id, isActive: true }, 
-      attributes: ["role", "availability"], 
+      where: { business_id, isActive: true },
+      attributes: ["role", "availability"],
       include: [
         { model: User, attributes: ["username", "fotoUrl"] },
       ],
@@ -82,6 +82,49 @@ exports.getPublicProfessionalsByBusinessId = async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar profissionais públicos por business_id:", error);
     res.status(500).json({ message: "Erro ao buscar profissionais", error });
+  }
+};
+
+exports.getAllBusinessesByUser = async (req, res) => {
+  try {
+    const user_id = req.user.user_id;
+
+    const professionals = await Professionals.findAll({
+      where: { user_id },
+      attributes: ['role'],
+      include: [
+        {
+          model: Businesses,
+          as: 'business',
+          where: { isActive: true },
+          attributes: ['business_id', 'business_name', 'main_photo_url', 'business_type'],
+        },
+      ],
+    });
+
+    if (professionals.length === 0) {
+      return res.status(404).json({
+        message: "Nenhum negócio encontrado para este usuário.",
+      });
+    }
+
+    const result = professionals
+      .map((prof) => {
+        const business = prof.business?.get({ plain: true });
+        if (!business) return null;
+
+        return {
+          ...business,
+          role: prof.role,
+        };
+      })
+      .filter(Boolean);
+
+    res.status(200).json(result);
+
+  } catch (error) {
+    console.error("Erro ao buscar negócios públicos por user_id:", error);
+    res.status(500).json({ message: "Erro ao buscar negócios", error });
   }
 };
 
@@ -127,6 +170,18 @@ exports.createProfessional = async (req, res) => {
     // Validar disponibilidade
     validateAvailability(availability);
 
+    // Validar se os horários de disponibilidade estão dentro do horário de funcionamento do negócio
+    const openingHour = business.opening_hour; // Hora de abertura do negócio
+    const closingHour = business.closing_hour; // Hora de fechamento do negócio
+
+    for (const slot of availability) {
+      if (slot.start < openingHour || slot.end > closingHour) {
+        return res.status(400).json({
+          message: `Os horários de disponibilidade devem estar entre ${openingHour} e ${closingHour}.`,
+        });
+      }
+    }
+
     // Verificar se o e-mail já está associado a um utilizador
     const existingUser = await User.findOne({ where: { email } });
 
@@ -134,7 +189,7 @@ exports.createProfessional = async (req, res) => {
 
     if (!existingUser) {
       // Enviar e-mail de convite
-      const activationLink = `http://localhost:3000/register?email=${email}`;
+      const activationLink = `${process.env.HOST}/auth/login?email=${email}`;
 
       const placeholders = {
         PROFESSIONAL_NAME: "Convidado", // Nome genérico, pois o utilizador ainda não existe

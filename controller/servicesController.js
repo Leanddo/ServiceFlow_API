@@ -57,6 +57,30 @@ exports.getServices = async (req, res) => {
   }
 };
 
+
+// Listar todos os serviços de um negócio
+exports.getServicesPrivate = async (req, res) => {
+  try {
+    const { business_id } = req.params;
+
+    // Verificar se o negócio existe
+    const business = await Businesses.findByPk(business_id);
+    if (!business) {
+      return res.status(404).json({ message: "Negócio não encontrado." });
+    }
+
+    // Obter os serviços do negócio
+    const services = await Services.findAll({
+      where: { business_id },
+    });
+
+    res.status(200).json(services);
+  } catch (error) {
+    console.error("Erro ao buscar serviços:", error);
+    res.status(500).json({ message: "Erro ao buscar serviços.", error });
+  }
+};
+
 // Obter um serviço específico
 exports.getServiceById = async (req, res) => {
   try {
@@ -64,7 +88,7 @@ exports.getServiceById = async (req, res) => {
 
     // Verificar se o serviço existe
     const service = await Services.findOne({
-      where: { service_id, business_id },
+      where: { service_id, business_id, isActive: true },
     });
 
     if (!service) {
@@ -167,7 +191,7 @@ exports.updateServicePhoto = async (req, res) => {
     }
 
     // Atualizar o campo `service_fotoUrl` com a nova foto
-    service.service_fotoUrl = `/serviceImg/${req.file.filename}`;
+    service.service_fotoUrl = `${process.env.API_HOST}/serviceImg/${req.file.filename}`;
     await service.save();
 
     res.status(200).json({

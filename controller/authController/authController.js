@@ -2,9 +2,11 @@ const { User, OTP, Professionals, Queues } = require("../../models/index");
 
 const bcrypt = require("bcrypt");
 const path = require("path");
+const jwt = require("jsonwebtoken");
 
 const { generateToken } = require("../../utils/jwtUtils");
 const sendEmail = require("../../utils/emailSender");
+
 
 require("dotenv").config();
 
@@ -143,8 +145,35 @@ exports.logout = async (req, res) => {
     httpOnly: true,
     secure: true,   // se usas HTTPS
     sameSite: 'Strict',
-    path: '/',      // tem de ser o mesmo path do cookie original
+    path: '/',      
   });
 
   res.status(200).send({ message: 'Logout successful' });
 }
+
+exports.isLoggedIn = async (req, res) => {
+  try {
+    // Verificar se o cookie de autenticação existe
+    const token = req.cookies.authcookie;
+
+    if (!token) {
+      return res.status(401).json(false);
+    }
+
+    // Verificar e decodificar o token
+    const decoded = await jwt.verify(token, process.env.JWTSECRET);
+
+    // Buscar o usuário no banco de dados
+    const user = await User.findByPk(decoded.user_id);
+
+    if (!user) {
+      return res.status(401).json(false);
+    }
+
+    // Retornar o status de login e informações básicas do usuário
+    return res.status(200).json(true);
+  } catch (error) {
+    console.error("Erro ao verificar login:", error);
+    return res.status(500).json({ isLoggedIn: false, message: "Erro interno ao verificar login." });
+  }
+};

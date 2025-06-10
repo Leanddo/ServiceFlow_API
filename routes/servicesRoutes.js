@@ -16,6 +16,14 @@ router.post(
 // Listar todos os serviços de um negócio
 router.get("/businesses/:business_id/services", servicesController.getServices);
 
+
+router.get(
+  "/businesses/:business_id/services/private",
+  requireAuth,
+  isOwnerOrManager,
+  servicesController.getServicesPrivate
+);
+
 // Obter um serviço específico
 router.get(
   "/businesses/:business_id/services/:service_id",
