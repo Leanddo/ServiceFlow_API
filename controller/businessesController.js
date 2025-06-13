@@ -204,6 +204,32 @@ exports.isBusinessOwner = async (req, res) => {
   }
 };
 
+exports.isBusinessProfessional = async (req, res) => {
+  try {
+    const { business_id } = req.params;
+
+    // Verificar se o usuário autenticado é o proprietário do negócio
+    const professional = await Professionals.findOne({
+      where: {
+        user_id: req.user.user_id, // ID do usuário autenticado
+        business_id, // ID do negócio
+      },
+    });
+
+    if (!professional) {
+      return res.status(200).json(false);
+    }
+
+    return res.status(200).json(true);
+  } catch (error) {
+    console.error("Erro ao verificar proprietário do negócio:", error);
+    res.status(500).json({
+      message: "Erro interno ao verificar o proprietário do negócio.",
+      error,
+    });
+  }
+};
+
 exports.changeBusinessStatus = async (req, res) => {
   const { business_id } = req.params;
   const { isActive } = req.body;

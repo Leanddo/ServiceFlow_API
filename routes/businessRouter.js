@@ -18,6 +18,14 @@ Router.get(
   businessController.isBusinessOwner
 );
 
+
+// Verificar se o usuário é o proprietário do negócio
+Router.get(
+  "/business/:business_id/is-professional",
+  requireAuth,
+  businessController.isBusinessProfessional
+);
+
 // Rotas protegidas
 Router.post(
   "/business/",

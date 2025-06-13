@@ -734,7 +734,7 @@ exports.updateQueueStatus = async (req, res) => {
       if (user) {
         const placeholders = {
           USERNAME: user.username,
-          SERVICE_REVIEW_LINK: `${process.env.HOST}/review/${queue.service_id}`,
+          SERVICE_REVIEW_LINK: `${process.env.HOST}/business/${queue.business_id}/review/${queue.service_id}`,
         };
 
         const templatePath = path.join(
