@@ -1,5 +1,7 @@
 .env
 config/config.json
 node_modules
-public
+public/business/*
+public/serviceImg/*
+public/userImg/*
 Criar_db.sql
