@@ -1,0 +1,20 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:adamgibbons/ics
+METHOD:PUBLISH
+X-PUBLISHED-TTL:PT1H
+BEGIN:VEVENT
+UID:K25d7bXIGs0twqxE9Uc1j
+SUMMARY:Serviço: Corte de Barba
+DTSTAMP:20250616T155935Z
+DTSTART:20250617T103000Z
+DESCRIPTION:Inscrição no serviço Corte de Barba no negócio Barbearia do Joã
+	o.
+URL:https://serviceflow.me
+LOCATION:R. Padre Ernesto Jacinto Raposo 18 A\, 9650-428 Povoação\, Portuga
+ORGANIZER;CN="ServiceFlow":MAILTO:no-reply@serviceflow.me
+ATTENDEE;CN="ola":mailto:ola@gmail.com
+DURATION:PT30M
+END:VEVENT
+END:VCALENDAR
