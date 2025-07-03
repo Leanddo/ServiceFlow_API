@@ -84,7 +84,7 @@ exports.addToQueue = async (req, res) => {
         business_id: service.business_id,
         queue_date,
         professional_id: availableProfessionals.map((p) => p.professional_id),
-        status: { [Op.not]: "canceled" },
+        status: { [Op.not]: "cancelled" },
       },
     });
 

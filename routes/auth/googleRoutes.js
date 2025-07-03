@@ -3,6 +3,7 @@ const passport = require("passport");
 const { googleAuth, googleCallback } = require("../../controller/authController/googleAuthController");
 
 const Router = express.Router();
+require("dotenv").config();
 
 Router.get("/auth/google", googleAuth)
 
@@ -15,7 +16,7 @@ Router.get("/auth/google/callback", (req, res, next) => {
         if (err || !data || !data.user) {
             console.error("Erro na autenticação com Google:", err || "Utilizador não encontrado");
             // Redirecionar para a página de login em caso de erro
-            return res.redirect("http://localhost:4200/auth/login");
+            return res.redirect(`${process.env.HOST}/auth/login`);
         }
 
         // Obter o token gerado para o usuário autenticado
@@ -29,7 +30,7 @@ Router.get("/auth/google/callback", (req, res, next) => {
         });
 
         // Redirecionar o usuário para a página de sucesso após autenticação
-        res.redirect("http://localhost:4200/auth/google-success");
+        res.redirect(`${process.env.HOST}`);
     })(req, res, next); // Passar os objetos req, res e next para o middleware do Passport
 });
 
