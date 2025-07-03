@@ -492,7 +492,7 @@ exports.addToQueueOwner = async (req, res) => {
         BUSINESS_NAME: business.business_name,
         SERVICE_NAME: service.service_name,
         QUEUE_DATE: new Date(queue_date).toLocaleString(),
-        DELETE_LINK: `https://serviceflow.me/queues/${newQueue.queue_id}/delete`,
+        DELETE_LINK: `${process.env.HOST}/user/account/appointments`,
       };
 
       await sendEmail({
@@ -524,7 +524,7 @@ exports.addToQueueOwner = async (req, res) => {
 
 exports.getUserQueues = async (req, res) => {
   try {
-    const user_id = req.user.user_id; 
+    const user_id = req.user.user_id;
 
     const queues = await Queues.findAll({
       where:
@@ -532,15 +532,15 @@ exports.getUserQueues = async (req, res) => {
       include: [
         {
           model: Services,
-          attributes: ["service_name"], 
+          attributes: ["service_name"],
         },
         {
           model: Businesses,
-          attributes: ["business_name", "business_address"], 
+          attributes: ["business_name", "business_address"],
         },
         {
           model: Professionals,
-          attributes: ["professional_id", "user_id"], 
+          attributes: ["professional_id", "user_id"],
         },
       ],
       attributes: [
@@ -549,9 +549,9 @@ exports.getUserQueues = async (req, res) => {
         "queue_estimate_wait_time",
         "queue_date",
         "status",
-        "user_id", 
+        "user_id",
       ],
-      order: [["queue_date", "ASC"]], 
+      order: [["queue_date", "ASC"]],
     });
 
     if (queues.length === 0) {
@@ -569,7 +569,7 @@ exports.getUserQueues = async (req, res) => {
       service_name: queue.Service.service_name,
       business_name: queue.Business.business_name,
       business_address: queue.Business.business_address,
-      isProfessional: queue.Professional?.user_id === user_id, 
+      isProfessional: queue.Professional?.user_id === user_id,
     }));
 
     res.status(200).json(formattedQueues);
@@ -731,10 +731,15 @@ exports.updateQueueStatus = async (req, res) => {
     if (status === "completed") {
       // Buscar utilizador para pegar email e username
       const user = await User.findByPk(queue.user_id);
+      const service = await Services.findByPk(queue.service_id);
+      const business = await Businesses.findByPk(queue.business_id);
+
       if (user) {
         const placeholders = {
           USERNAME: user.username,
           SERVICE_REVIEW_LINK: `${process.env.HOST}/business/${queue.business_id}/review/${queue.service_id}`,
+          SERVICE_NAME: service.service_name,
+          BUSINESS_NAME: business.business_name,
         };
 
         const templatePath = path.join(
@@ -751,7 +756,6 @@ exports.updateQueueStatus = async (req, res) => {
           });
         } catch (emailError) {
           console.error("Erro ao enviar email de avaliação:", emailError);
-          // Não bloqueia a resposta, só regista o erro
         }
       }
     }

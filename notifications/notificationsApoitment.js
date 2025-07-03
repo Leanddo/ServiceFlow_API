@@ -6,7 +6,7 @@ const path = require("path");
 
 // Tarefa agendada para rodar todos os dias às 8h
 const scheduleNotificationAppointment = async () => {
-  cron.schedule("00 8 * * *", async () => {
+  cron.schedule("43 20 * * *", async () => {
     try {
       const now = new Date();
       const tomorrow = new Date();

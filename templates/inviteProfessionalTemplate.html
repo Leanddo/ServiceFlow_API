@@ -1,60 +1,166 @@
-<html>
+<!DOCTYPE html>
+<html lang="pt-br">
   <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Convite para se juntar ao ServiceFlow</title>
     <style>
+      /* Estilos gerais e para clientes de e-mail que suportam <style> */
       body {
-        font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f9f9f9;
-      }
-      .container {
-        max-width: 600px;
-        margin: 20px auto;
-        background: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 20px;
-        text-align: center;
-      }
-      .header {
-        font-size: 24px;
-        font-weight: bold;
-        color: #333;
-      }
-      .message {
-        font-size: 16px;
-        color: #666;
-        margin-bottom: 20px;
-      }
-      .link {
-        display: inline-block;
-        margin: 20px 0;
-        padding: 10px 20px;
-        font-size: 16px;
-        color: #fff;
-        background-color: #007bff;
-        text-decoration: none;
-        border-radius: 5px;
-      }
-      .footer {
-        font-size: 12px;
-        color: #999;
-        margin-top: 20px;
+        width: 100% !important;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        background-color: #f4f7f6; /* Um cinza levemente mais frio e moderno */
+        font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
       }
     </style>
   </head>
-  <body>
-    <div class="container">
-      <div class="header">Convite para se juntar ao ServiceFlow</div>
-      <p class="message">
-        Olá {{PROFESSIONAL_NAME}},<br />
-        Você foi convidado para se juntar ao negócio <strong>{{BUSINESS_NAME}}</strong> como
-        <strong>{{ROLE}}</strong>. Para completar seu registro, clique no botão abaixo:
-      </p>
-      <a href="{{REGISTRATION_LINK}}" class="link">Registrar-se</a>
-      <p class="footer">
-        Se você não esperava este convite, por favor, ignore este e-mail.
-      </p>
-    </div>
+  <body style="margin: 0; padding: 0; background-color: #f4f7f6">
+    <center>
+      <table
+        width="100%"
+        border="0"
+        cellpadding="0"
+        cellspacing="0"
+        style="background-color: #f4f7f6; padding: 20px 0"
+      >
+        <tr>
+          <td align="center">
+            <!-- Início do Container do E-mail -->
+            <table
+              width="600"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              style="
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+                border-top: 4px solid #6a0dad;
+              "
+            >
+              <!-- Seção do Logo -->
+              <tr>
+                <td align="center" style="padding: 40px 0 20px 0">
+                  <h1
+                    style="
+                      margin: 0;
+                      font-size: 3rem;
+                      font-weight: 600;
+                      color: #333333;
+                      line-height: 1;
+                    "
+                  >
+                    Service<span style="color: #6a0dad">Flow</span>
+                  </h1>
+                </td>
+              </tr>
+              <!-- Seção do Conteúdo Principal -->
+              <tr>
+                <td align="center" style="padding: 0 40px 40px 40px">
+                  <table
+                    width="100%"
+                    border="0"
+                    cellpadding="0"
+                    cellspacing="0"
+                  >
+                    <!-- Título -->
+                    <tr>
+                      <td align="center" style="padding-bottom: 25px">
+                        <h2
+                          style="
+                            margin: 0;
+                            font-size: 24px;
+                            font-weight: bold;
+                            color: #333333;
+                          "
+                        >
+                          Você foi convidado!
+                        </h2>
+                      </td>
+                    </tr>
+                    <!-- Mensagem -->
+                    <tr>
+                      <td align="center" style="padding-bottom: 30px">
+                        <p
+                          style="
+                            margin: 0;
+                            font-size: 16px;
+                            line-height: 1.6;
+                            color: #555555;
+                          "
+                        >
+                          Olá
+                          <strong>{{PROFESSIONAL_NAME}}</strong>,<br /><br />
+                          Você recebeu um convite para se juntar à equipe de
+                          <strong>{{BUSINESS_NAME}}</strong> como
+                          <strong>{{ROLE}}</strong> na plataforma ServiceFlow.
+                        </p>
+                      </td>
+                    </tr>
+                    <!-- Botão de Ação -->
+                    <tr>
+                      <td align="center" style="padding-bottom: 30px">
+                        <a
+                          href="{{REGISTRATION_LINK}}"
+                          target="_blank"
+                          style="
+                            display: inline-block;
+                            padding: 14px 32px;
+                            font-size: 16px;
+                            font-weight: 600;
+                            color: #ffffff;
+                            background-color: #6a0dad;
+                            text-decoration: none;
+                            border-radius: 25px;
+                            transition: background-color 0.3s ease;
+                          "
+                        >
+                          Completar Registro
+                        </a>
+                      </td>
+                    </tr>
+                    <!-- Rodapé do conteúdo -->
+                    <tr>
+                      <td
+                        align="center"
+                        style="padding-top: 20px; border-top: 1px solid #eeeeee"
+                      >
+                        <p
+                          style="
+                            margin: 0;
+                            font-size: 13px;
+                            color: #888888;
+                            line-height: 1.5;
+                          "
+                        >
+                          Se você não esperava este convite, pode ignorar este
+                          e-mail com segurança.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            <!-- Fim do Container do E-mail -->
+          </td>
+        </tr>
+        <!-- Rodapé Geral -->
+        <tr>
+          <td align="center" style="padding: 20px 0">
+            <p style="margin: 0; font-size: 12px; color: #999999">
+              © 2024 ServiceFlow. Todos os direitos reservados.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </center>
   </body>
 </html>

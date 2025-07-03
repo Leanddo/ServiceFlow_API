@@ -212,17 +212,19 @@ exports.createProfessional = async (req, res) => {
     }
 
     // Verificar se o utilizador já está associado a este negócio
-    const existingProfessional = await Professionals.findOne({
-      where: {
-        user_id: existingUser ? existingUser.user_id : null,
-        business_id,
-      },
-    });
-
-    if (existingProfessional) {
-      return res.status(400).json({
-        message: "Este utilizador já está associado a este negócio.",
+    let existingProfessional = null;
+    if (existingUser) {
+      existingProfessional = await Professionals.findOne({
+        where: {
+          user_id: existingUser.user_id,
+          business_id,
+        },
       });
+      if (existingProfessional) {
+        return res.status(400).json({
+          message: "Este utilizador já está associado a este negócio.",
+        });
+      }
     }
 
     // Criar o profissional associado ao utilizador existente
