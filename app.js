@@ -32,7 +32,7 @@ db.authenticate()
 app.use(cookieParser());
 
 app.use(cors({
-  origin: 'http://localhost:4200',  // só permite este domínio
+  origin: ['http://localhost:4200', "https://serviceflow.me"],  // só permite este domínio
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
   credentials: true  // permite cookies, autenticação etc.
 }));
