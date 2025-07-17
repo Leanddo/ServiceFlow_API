@@ -95,7 +95,7 @@ exports.signUp = async (req, res) => {
     return res.status(201).json({ username, email });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Erro interno" });
   }
 };
 
@@ -103,7 +103,7 @@ exports.login = async (req, res) => {
   const { password, email } = req.body;
 
   if (!password || !email) {
-    return res.status(400).json({ error: "incorrect username or email" });
+    return res.status(400).json({ error: "Email ou senha incorretos" });
   }
 
   try {
@@ -116,7 +116,7 @@ exports.login = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Incorrect password or email" });
+      return res.status(401).json({ message: "password ou email incorreto" });
     }
 
     const token = await generateToken(user);
@@ -135,7 +135,7 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Erro interno" });
   }
 };
 
@@ -148,7 +148,7 @@ exports.logout = async (req, res) => {
     path: '/',      
   });
 
-  res.status(200).send({ message: 'Logout successful' });
+  res.status(200).send({ message: 'Logout com sucesso' });
 }
 
 exports.isLoggedIn = async (req, res) => {
