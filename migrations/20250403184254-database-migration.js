@@ -433,10 +433,10 @@ module.exports = {
     await queryInterface.dropTable("Notifications"); // depende de Users
     await queryInterface.dropTable("Reviews"); // depende de Users, Services 
     await queryInterface.dropTable("Professionals"); // depende de Users, Businesses
-    await queryInterface.dropTable("Services");
-    await queryInterface.dropTable("BusinessPhotos"); // depende de nada// depende de Businesses
-    await queryInterface.dropTable("Businesses"); // depende de nada
-    await queryInterface.dropTable("PasswordResetToken");
-    await queryInterface.dropTable("Users"); // é base para várias  
+    await queryInterface.dropTable("BusinessPhotos"); // depende de Businesses
+    await queryInterface.dropTable("Services"); // pode depender de Businesses
+    await queryInterface.dropTable("PasswordResetToken"); // depende de Users
+    await queryInterface.dropTable("Businesses"); // pode ter ligações mas já foi tratado
+    await queryInterface.dropTable("Users"); // só pode ser apagada no fim
   },
 };
